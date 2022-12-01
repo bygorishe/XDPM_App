@@ -34,8 +34,8 @@ namespace XDPM_App
         {
             InitializeComponent();
             data = new Data();
-
-            //InOut.ReadWavFile("C:/Users/angry/Downloads/sample-3s.wav");
+            List<DataPoint> list = InOut.ReadWavFile("C:/Users/angry/Downloads/test_sample_1s.wav", out int rate);
+            FilePlot.Model = BuildModel("sample", rate.ToString(), list);
             //List<DataPoint> list = InOut.Read("C:/Users/angry/Desktop/pgp_2ms.dat");
         }
 

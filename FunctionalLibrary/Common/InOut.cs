@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using NAudio.Wave;
 using OxyPlot;
+using Spectrogram;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,27 +63,30 @@ namespace XDPM_App.Common
             return points;
         }
 
-        public static List<DataPoint> ReadWavFile(string path)
+        // боже храни тебя господь https://github.com/swharden/Spectrogram
+        static (List<double> audio, int sampleRate) ReadMono(string filePath, double multiplier = 16_000)
+        {
+            using var afr = new NAudio.Wave.AudioFileReader(filePath);
+            int sampleRate = afr.WaveFormat.SampleRate;
+            int bytesPerSample = afr.WaveFormat.BitsPerSample / 8;
+            int sampleCount = (int)(afr.Length / bytesPerSample);
+            int channelCount = afr.WaveFormat.Channels;
+            var audio = new List<double>(sampleCount);
+            var buffer = new float[sampleRate * channelCount];
+            int samplesRead = 0;
+            while ((samplesRead = afr.Read(buffer, 0, buffer.Length)) > 0)
+                audio.AddRange(buffer.Take(samplesRead).Select(x => x * multiplier));
+            return (audio, sampleRate);
+        }
+
+        public static List<DataPoint> ReadWavFile(string path, out int sampleRate)
         {
             List<DataPoint> points = new();
-            //List<short> unanalyzed_values = new List<short>();
-            //AudioFileReader audioReader = new(path);
 
-            ////8192, 4096, 2048, 1024
-            //int BUFFERSIZE = 8192;
-            //var buffer = new byte[BUFFERSIZE];
-            //int bytes_read = audioReader.Read(buffer, 0, buffer.Length);
-            //int BYTES_PER_POINT = audioReader.WaveFormat.BitsPerSample / 8; //8Bit = 1Byte
-            //for (int n = 0; n < BYTES_PER_POINT; n++)
-            //{
-            //    short[] values = new short[buffer.Length / BYTES_PER_POINT];
-            //    for (int i = 0; i < bytes_read; i += BYTES_PER_POINT)
-            //        values[i / BYTES_PER_POINT] = (short)((buffer[i + 1] << 8) | buffer[i + 0]);
-            //    unanalyzed_values.AddRange(values);
-            //}
+            (List<double> t, sampleRate) = ReadMono(path);
 
-            //for (int i = 0; i < unanalyzed_values.Count; i++)
-            //    points.Add(new DataPoint(i, unanalyzed_values[i]));
+            for (int i = 0; i < t.Count; i++)
+                points.Add(new DataPoint(i, t[i]));
 
             return points;
         }
