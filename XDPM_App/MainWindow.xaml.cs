@@ -445,18 +445,18 @@ namespace XDPM_App
             f2.Model = BuildModel("Stroke", "", t2);
             f1.Model = BuildModel("Reject", "", t3);
         }
-
+        Analysis a1, a2, a3, a4;
         private void Click12_3(object sender, RoutedEventArgs e)
         {
-            Analysis a1 = new(t, 2 * m + 1, 10);
-            Analysis a2 = new(t1, 2 * m + 1, 10);
-            Analysis a3 = new(t2, 2 * m + 1, 10);
-            Analysis a4 = new(t3, 2 * m + 1, 10);
+            a1 = new(t, 2 * m + 1, 10);
+             a2 = new(t1, 2 * m + 1, 10);
+             a3 = new(t2, 2 * m + 1, 10);
+             a4 = new(t3, 2 * m + 1, 10);
 
             ff4.Model = BuildModel("Low Pass spect", "", a1.SpectrFourier(m, 0, 0.002));
             ff3.Model = BuildModel("high Pass spect", "", a2.SpectrFourier(m, 0, 0.002));
-            ff2.Model = BuildModel("Lsstrow Pass spect", "", a3.SpectrFourier(m, 0, 0.002));
-            ff1.Model = BuildModel("rej Pass spect", "", a4.SpectrFourier(m, 0, 0.002));
+            ff2.Model = BuildModel("stroke spect", "", a3.SpectrFourier(m, 0, 0.002));
+            ff1.Model = BuildModel("rej spect", "", a4.SpectrFourier(m, 0, 0.002));
         }
 
         private void FileClick(object sender, RoutedEventArgs e)
@@ -465,9 +465,57 @@ namespace XDPM_App
             Analysis a = new(data.fileDP, 1000, 10);
 
 
-            FilePlot.Model = BuildModel("Plot FROM file", "", a.SpectrFourier(500, 0));
-            //FilePlot.Model = BuildModel("file", "", data.fileDP);
-            InOut.Write(data.fileDP);
+            FileSpectrPlot.Model = BuildModel("Plot FROM file", "", a.SpectrFourier(500, 0));
+            FilePlot.Model = BuildModel("file", "", data.fileDP);
+            //InOut.Write(data.fileDP);
+        }
+
+        private void Click13(object sender, RoutedEventArgs e)
+        {
+            //List<DataPoint> points = data.fileDP;
+            //DataPointOperations.Convol(1000, 64, t, data.fileDP);
+            List<DataPoint> t, t1, t2, t3;
+            int m = 64;
+            double delta_t = 0.002;
+            List<double> lpw = new(2 * m + 1), hpw = new(2 * m + 1), bpw = new(2 * m + 1), bsw = new(2 * m + 1);
+            Processing.LowPassFilter(5, delta_t, m, ref lpw);
+            Processing.HighPassFilter(55, delta_t, m, ref hpw);
+            Processing.StrokeFilter(5, 55, delta_t, m, ref bpw);
+            Processing.rejectFilter(5, 55, delta_t, m, ref bsw);
+            t = new List<DataPoint>(m + 1); t1 = new List<DataPoint>(m + 1); t2 = new List<DataPoint>(m + 1); t3 = new List<DataPoint>(m + 1);
+            for (int i = 0; i <= 2 * m; i++)
+            {
+                t.Add(new DataPoint(i, lpw[i]));
+                t1.Add(new DataPoint(i, hpw[i]));
+                t2.Add(new DataPoint(i, bpw[i]));
+                t3.Add(new DataPoint(i, bsw[i]));
+            }
+
+            f4.Model = BuildModel("Low Pass", "", t);
+            f3.Model = BuildModel("High Pass", "", t1);
+            f2.Model = BuildModel("Stroke", "", t2);
+            f1.Model = BuildModel("Reject", "", t3);
+
+            List<DataPoint> points1 = DataPointOperations.Convol(1000, 2 * m +1, t, data.fileDP);
+            List<DataPoint> points2 = DataPointOperations.Convol(1000, 2 * m+1, t1, data.fileDP);
+            List<DataPoint> points3 = DataPointOperations.Convol(1000, 2 * m + 1, t2, data.fileDP);
+            List<DataPoint> points4 = DataPointOperations.Convol(1000, 2 * m + 1, t3, data.fileDP);
+
+            fff4.Model = BuildModel("Low Pass ", "", points1);
+            fff3.Model = BuildModel("high Pass ", "", points2);
+            fff2.Model = BuildModel("stroke ", "", points3);
+            fff1.Model = BuildModel("reject Pass ", "", points4);
+
+            Analysis a11 = new(points1, 1000, 10);
+            Analysis a22 = new(points2, 1000, 10);
+            Analysis a33 = new(points3, 1000, 10);
+            Analysis a44 = new(points4, 1000, 10);
+
+
+            ffff4.Model = BuildModel("Low Pass (only low frequency)", "", a11.SpectrFourier(500, 0));
+            ffff3.Model = BuildModel("high Pass (only high frequency)", "", a22.SpectrFourier(500, 0));
+            ffff2.Model = BuildModel("stroke (only middle frequency)", "", a33.SpectrFourier(500, 0));
+            ffff1.Model = BuildModel("reject (low and high frequency)", "", a44.SpectrFourier(500, 0));
         }
     }
 }

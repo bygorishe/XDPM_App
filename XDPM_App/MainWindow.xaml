@@ -789,6 +789,74 @@
                     </Border>
                 </TabItem.Content>
             </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    FilesSpectr
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <oxy:PlotView  x:Name="FileSpectrPlot"/>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    13F
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="fff1" Grid.Row="0" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="fff2" Grid.Row="2" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="fff3" Grid.Row="0" Grid.Column="2"/>
+                            <oxy:PlotView  x:Name="fff4" Grid.Row="2" Grid.Column="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    13FSpectr
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="ffff1" Grid.Row="0" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="ffff2" Grid.Row="2" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="ffff3" Grid.Row="0" Grid.Column="2"/>
+                            <oxy:PlotView  x:Name="ffff4" Grid.Row="2" Grid.Column="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
         </TabControl>
 
         <ScrollViewer Grid.Column="1" MinWidth="110" VerticalScrollBarVisibility="Auto">
@@ -936,6 +1004,7 @@
                 <Button Content="3" Click="Click12_2"/>
                 <Button Content="3" Click="Click12_3"/>
                 <Button Content="Open File" Click="FileClick"/>
+                <Button Content="13" Click="Click13"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
