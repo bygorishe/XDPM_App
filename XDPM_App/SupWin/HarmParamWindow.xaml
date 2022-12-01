@@ -1,0 +1,45 @@
+﻿<Window x:Class="XDPM_App.HarmParamWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XDPM_App"
+        mc:Ignorable="d"
+        Title="HarmParamWindow" Height="450" Width="600">
+    <Border BorderBrush="Black" BorderThickness="3">
+        <DockPanel Background="#CBC7F9">
+            <Grid x:Name="LayersInfo" DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.2*"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock TextAlignment="Center" Grid.Row="0" Grid.Column="0" Text="Номер"/>
+                <TextBlock TextAlignment="Center" Grid.Row="0" Grid.Column="1" Text="Амплитуда колебания (A)"/>
+                <TextBlock TextAlignment="Center" Grid.Row="0" Grid.Column="2" Text="Частота (f)"/>
+            </Grid>
+            <Grid DockPanel.Dock="Bottom">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0" CanContentScroll="True">
+                    <Grid x:Name="grid" Background="White">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ScrollViewer>
+                <DockPanel Grid.Row="1">
+                    <Button x:Name="Save" Click="SaveClick" Content="Сохранить" Width="200" Height="30" HorizontalAlignment="Left"/>
+                    <Button x:Name="Exit" Click="ExitClick" Content="Закрыть" Width="200" Height="30" HorizontalAlignment="Right"/>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+    </Border>
+</Window>
