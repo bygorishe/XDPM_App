@@ -17,6 +17,12 @@ namespace XDPM_App.ADMP
         private List<double> xk_X = null!;
         private List<double> AvevageValue_i = null!;
         private List<double> StandartOtklonenie_i = null!;
+
+        public Analysis(List<DataPoint> dataPoints, int N)
+        {
+            this.N = N;
+            f = DataPointOperations.GetValue(dataPoints);
+        }
         public Analysis(List<DataPoint> dataPoints, int N, int M)
         {
             this.N = N;

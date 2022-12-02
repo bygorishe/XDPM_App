@@ -34,9 +34,6 @@ namespace XDPM_App
         {
             InitializeComponent();
             data = new Data();
-            List<DataPoint> list = InOut.ReadWavFile("C:/Users/angry/Downloads/test_sample_1s.wav", out int rate);
-            FilePlot.Model = BuildModel("sample", rate.ToString(), list);
-            //List<DataPoint> list = InOut.Read("C:/Users/angry/Desktop/pgp_2ms.dat");
         }
 
         private void TextBox_paramN_TextChanged(object sender, TextChangedEventArgs e)
@@ -461,12 +458,12 @@ namespace XDPM_App
 
         private void FileClick(object sender, RoutedEventArgs e)
         {
-            data.fileDP = InOut.ReadBinFile(0.002);
+            data.fileDP = InOut.Read(out int rate);
             Analysis a = new(data.fileDP, 1000, 10);
 
 
             FileSpectrPlot.Model = BuildModel("Plot FROM file", "", a.SpectrFourier(500, 0));
-            FilePlot.Model = BuildModel("file", "", data.fileDP);
+            FilePlot.Model = BuildModel("file", rate.ToString(), data.fileDP);
             //InOut.Write(data.fileDP);
         }
 
@@ -496,6 +493,16 @@ namespace XDPM_App
             f2.Model = BuildModel("Stroke", "", t2);
             f1.Model = BuildModel("Reject", "", t3);
 
+            Analysis a11 = new(t, 2*m+1);
+            Analysis a22 = new(t1, 2 * m + 1);
+            Analysis a33 = new(t2, 2 * m + 1);
+            Analysis a44 = new(t3, 2 * m + 1);
+
+            ff4.Model = BuildModel("Low Pass spect", "", a11.SpectrFourier(m, 0, 0.002));
+            ff3.Model = BuildModel("high Pass spect", "", a22.SpectrFourier(m, 0, 0.002));
+            ff2.Model = BuildModel("stroke spect", "", a33.SpectrFourier(m, 0, 0.002));
+            ff1.Model = BuildModel("rej spect", "", a44.SpectrFourier(m, 0, 0.002));
+
             List<DataPoint> points1 = DataPointOperations.Convol(1000, 2 * m +1, t, data.fileDP);
             List<DataPoint> points2 = DataPointOperations.Convol(1000, 2 * m+1, t1, data.fileDP);
             List<DataPoint> points3 = DataPointOperations.Convol(1000, 2 * m + 1, t2, data.fileDP);
@@ -504,12 +511,12 @@ namespace XDPM_App
             fff4.Model = BuildModel("Low Pass ", "", points1);
             fff3.Model = BuildModel("high Pass ", "", points2);
             fff2.Model = BuildModel("stroke ", "", points3);
-            fff1.Model = BuildModel("reject Pass ", "", points4);
+            fff1.Model = BuildModel("reject ", "", points4);
 
-            Analysis a11 = new(points1, 1000, 10);
-            Analysis a22 = new(points2, 1000, 10);
-            Analysis a33 = new(points3, 1000, 10);
-            Analysis a44 = new(points4, 1000, 10);
+             a11 = new(points1, 1000);
+             a22 = new(points2, 1000);
+             a33 = new(points3, 1000);
+             a44 = new(points4, 1000);
 
 
             ffff4.Model = BuildModel("Low Pass (only low frequency)", "", a11.SpectrFourier(500, 0));

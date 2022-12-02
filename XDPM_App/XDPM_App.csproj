@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\FunctionalLibrary\FunctionalLibrary.csproj" />
     <ProjectReference Include="..\FunctionalLibrary\FunctionalLibrary.csproj" />
   </ItemGroup>
 

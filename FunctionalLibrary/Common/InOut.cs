@@ -1,13 +1,9 @@
-﻿using Microsoft.Win32;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using OxyPlot;
-using Spectrogram;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -20,12 +16,24 @@ namespace XDPM_App.Common
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private static string Read()
+        public static List<DataPoint> Read(out int rate, double delta_t = 0.001, bool doubleAccuracy = false)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new();
             if (openFileDialog.ShowDialog() == false)
                 throw new Exception("File not found");
-            return openFileDialog.FileName;
+            string path = openFileDialog.FileName;
+            string fileExtension = Path.GetExtension(path);
+            switch (fileExtension)
+            {
+                case ".dat":
+                        return ReadBinFile(path, out rate, delta_t, doubleAccuracy);
+                case ".wav":
+                    return ReadWavFile(path, out rate);
+                case ".txt":
+
+                default:
+                    throw new Exception("cant read this file format");
+            }
         }
 
         /// <summary>
@@ -34,9 +42,8 @@ namespace XDPM_App.Common
         /// <param name="delta_t">Sampling interval</param>
         /// <param name="doubleAccuracy">If need douuble instead float</param>
         /// <returns></returns>
-        public static List<DataPoint> ReadBinFile(double delta_t = 0.001, bool doubleAccuracy = false)
+        private static List<DataPoint> ReadBinFile(string path, out int rate, double delta_t, bool doubleAccuracy)
         {
-            string path = Read();
             List<DataPoint> points = new();
             using (BinaryReader binaryReader = new(File.Open(path, FileMode.Open)))
             {
@@ -60,13 +67,43 @@ namespace XDPM_App.Common
 
                 }
             }
+            //fix
+            rate = 1;
+
             return points;
         }
 
-        // боже храни тебя господь https://github.com/swharden/Spectrogram
-        static (List<double> audio, int sampleRate) ReadMono(string filePath, double multiplier = 16_000)
+        private static List<DataPoint> ReadTxtFile(string path, out int rate, double delta_t)
         {
-            using var afr = new NAudio.Wave.AudioFileReader(filePath);
+            List<DataPoint> points = new();
+            using (StreamReader streamReader = new(File.Open(path, FileMode.Open)))
+            {
+                try
+                {
+                    int i = 0;
+                    while (true)
+                    {
+                        double value = streamReader.Read();
+                        points.Add(new DataPoint(i++ * delta_t, value));
+                    }
+                }
+                catch (EndOfStreamException)
+                {
+
+                }
+            }
+            //fix
+            rate = 1;
+
+            return points;
+        }
+
+        // боже храни тебя господьб найдено и честно позаимствованое
+        // https://stackoverflow.com/questions/59469985/c-sharp-get-frequency-spectrum-lines-of-a-wav-file
+        // https://github.com/swharden/Spectrogram //если нужны спектограммы
+        private static (List<double> audio, int sampleRate) ReadMono(string filePath, double multiplier = 16_000)
+        {
+            using var afr = new AudioFileReader(filePath);
             int sampleRate = afr.WaveFormat.SampleRate;
             int bytesPerSample = afr.WaveFormat.BitsPerSample / 8;
             int sampleCount = (int)(afr.Length / bytesPerSample);
@@ -79,52 +116,50 @@ namespace XDPM_App.Common
             return (audio, sampleRate);
         }
 
-        public static List<DataPoint> ReadWavFile(string path, out int sampleRate)
+        private static List<DataPoint> ReadWavFile(string path, out int sampleRate)
         {
             List<DataPoint> points = new();
-
             (List<double> t, sampleRate) = ReadMono(path);
-
             for (int i = 0; i < t.Count; i++)
                 points.Add(new DataPoint(i, t[i]));
-
             return points;
         }
 
-
-        //public static void Write(List<DataPoint> list, string name)
-        //{
-        //    int BUFFERSIZE = 4096;
-        //    var buffer = new byte[BUFFERSIZE];
-        //    for (int i = 0; i < list.Count(); i++)
-        //        buffer[i] = Convert.ToByte(list[i].Y);
-        //    WaveFileWriter writer = new WaveFileWriter(name, new WaveFormat(8000, 1)); ;
-        //    writer.Write(buffer, 0, buffer.Length);
-
-        //}
-
-        /// <summary>
-        /// Write your datapoints to file
-        /// </summary>
-        /// <param name="list">Datapoints</param>
-        /// <param name="fileName">Name of your file</param>
-        /// <param name="fileFormat">File format that you need</param>
         public static void Write(List<DataPoint> list)
         {
             SaveFileDialog dialog = new();
-            dialog.Filter = "Text files(*.txt)|*.txt|All files(*.*)|*.*|Bin file(*.bin)|*.bin|Bin file(*.dat)|*.dat";
+            dialog.Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat"; /* | All files(*.*) | *.*| Bin file(*.bin) | *.bin*/
             if (dialog.ShowDialog() == false)
                 return;
-            //StringBuilder builder = new(fileName);
-            //builder.Append('.').Append(fileFormat);
-            using (BinaryWriter binaryWriter = new(File.Open(dialog.FileName, FileMode.OpenOrCreate)))
+            string path = dialog.FileName;
+            string fileExt = Path.GetExtension(path);
+            switch (fileExt)
             {
-                try
-                {
-                    for (int i = 0; i < list.Count; i++)
-                        binaryWriter.Write(list[i].Y);
-                }
-                finally { }
+                case ".dat":
+                    using (BinaryWriter binaryWriter = new(File.Open(path, FileMode.OpenOrCreate)))
+                    {
+                        try
+                        {
+                            for (int i = 0; i < list.Count; i++)
+                                binaryWriter.Write(list[i].Y);
+                        }
+                        finally { }
+                    }
+                    break;
+                case ".txt":
+                    using (StreamWriter streamWriter = new(File.Open(path, FileMode.OpenOrCreate)))
+                    {
+                        try
+                        {
+                            for (int i = 0; i < list.Count; i++)
+                                streamWriter.Write(list[i].Y);
+                        }
+                        finally { }
+                    }
+                    break;
+                case ".wav":
+                    
+                    break;
             }
         }
     }
