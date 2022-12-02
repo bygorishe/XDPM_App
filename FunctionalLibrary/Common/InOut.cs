@@ -30,7 +30,7 @@ namespace XDPM_App.Common
                 case ".wav":
                     return ReadWavFile(path, out rate);
                 case ".txt":
-
+                    return ReadTxtFile(path, out rate, delta_t);
                 default:
                     throw new Exception("cant read this file format");
             }
@@ -136,30 +136,40 @@ namespace XDPM_App.Common
             switch (fileExt)
             {
                 case ".dat":
-                    using (BinaryWriter binaryWriter = new(File.Open(path, FileMode.OpenOrCreate)))
-                    {
-                        try
-                        {
-                            for (int i = 0; i < list.Count; i++)
-                                binaryWriter.Write(list[i].Y);
-                        }
-                        finally { }
-                    }
+                    WriteBinFile(list, path);
                     break;
                 case ".txt":
-                    using (StreamWriter streamWriter = new(File.Open(path, FileMode.OpenOrCreate)))
-                    {
-                        try
-                        {
-                            for (int i = 0; i < list.Count; i++)
-                                streamWriter.Write(list[i].Y);
-                        }
-                        finally { }
-                    }
+                    WriteTxtFile(list, path);
                     break;
                 case ".wav":
                     
                     break;
+            }
+        }
+
+        private static void WriteBinFile(List<DataPoint> list, string path)
+        {
+            using (BinaryWriter binaryWriter = new(File.Open(path, FileMode.OpenOrCreate)))
+            {
+                try
+                {
+                    for (int i = 0; i < list.Count; i++)
+                        binaryWriter.Write(list[i].Y);
+                }
+                finally { }
+            }
+        }
+
+        private static void WriteTxtFile(List<DataPoint> list, string path)
+        {
+            using (StreamWriter streamWriter = new(File.Open(path, FileMode.OpenOrCreate)))
+            {
+                try
+                {
+                    for (int i = 0; i < list.Count; i++)
+                        streamWriter.Write(list[i].Y);
+                }
+                finally { }
             }
         }
     }

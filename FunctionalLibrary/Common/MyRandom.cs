@@ -6,6 +6,9 @@ namespace XDPM_App.Common
     {
         int seed;
 
+        /// <summary>
+        /// Init random
+        /// </summary>
         public MyRandom()
         {
             seed = DateTime.Now.Millisecond;

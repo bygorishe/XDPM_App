@@ -1,12 +1,10 @@
-﻿using XDPM_App;
-using XDPM_App.Common;
+﻿using XDPM_App.Common;
 using XDPM_App.ADMP;
 using OxyPlot;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using static XDPM_App.ADMP.Model;
-using System.Windows.Markup;
 
 namespace XDPM_App
 {
@@ -458,11 +456,11 @@ namespace XDPM_App
 
         private void FileClick(object sender, RoutedEventArgs e)
         {
-            data.fileDP = InOut.Read(out int rate);
+            data.fileDP = InOut.Read(out int rate, 0.002);
             Analysis a = new(data.fileDP, 1000, 10);
 
 
-            FileSpectrPlot.Model = BuildModel("Plot FROM file", "", a.SpectrFourier(500, 0));
+            FileSpectrPlot.Model = BuildModel("Plot FROM file", "", a.SpectrFourier(500, 0, 0.002));
             FilePlot.Model = BuildModel("file", rate.ToString(), data.fileDP);
             //InOut.Write(data.fileDP);
         }
@@ -475,17 +473,17 @@ namespace XDPM_App
             int m = 64;
             double delta_t = 0.002;
             List<double> lpw = new(2 * m + 1), hpw = new(2 * m + 1), bpw = new(2 * m + 1), bsw = new(2 * m + 1);
-            Processing.LowPassFilter(5, delta_t, m, ref lpw);
-            Processing.HighPassFilter(55, delta_t, m, ref hpw);
-            Processing.StrokeFilter(5, 55, delta_t, m, ref bpw);
-            Processing.rejectFilter(5, 55, delta_t, m, ref bsw);
-            t = new List<DataPoint>(m + 1); t1 = new List<DataPoint>(m + 1); t2 = new List<DataPoint>(m + 1); t3 = new List<DataPoint>(m + 1);
+            Processing.LowPassFilter(15, delta_t, m, ref lpw);
+            Processing.HighPassFilter(100, delta_t, m, ref hpw);
+            Processing.StrokeFilter(10, 100, delta_t, m, ref bpw);
+            Processing.rejectFilter(10, 100, delta_t, m, ref bsw);
+            t = new List<DataPoint>(2*m + 1); t1 = new List<DataPoint>(2*m + 1); t2 = new List<DataPoint>(2*m + 1); t3 = new List<DataPoint>(2*m + 1);
             for (int i = 0; i <= 2 * m; i++)
             {
-                t.Add(new DataPoint(i, lpw[i]));
-                t1.Add(new DataPoint(i, hpw[i]));
-                t2.Add(new DataPoint(i, bpw[i]));
-                t3.Add(new DataPoint(i, bsw[i]));
+                t.Add(new DataPoint(i*delta_t, lpw[i]));
+                t1.Add(new DataPoint(i*delta_t, hpw[i]));
+                t2.Add(new DataPoint(i*delta_t, bpw[i]));
+                t3.Add(new DataPoint(i*delta_t, bsw[i]));
             }
 
             f4.Model = BuildModel("Low Pass", "", t);
@@ -503,26 +501,31 @@ namespace XDPM_App
             ff2.Model = BuildModel("stroke spect", "", a33.SpectrFourier(m, 0, 0.002));
             ff1.Model = BuildModel("rej spect", "", a44.SpectrFourier(m, 0, 0.002));
 
-            List<DataPoint> points1 = DataPointOperations.Convol(1000, 2 * m +1, t, data.fileDP);
-            List<DataPoint> points2 = DataPointOperations.Convol(1000, 2 * m+1, t1, data.fileDP);
-            List<DataPoint> points3 = DataPointOperations.Convol(1000, 2 * m + 1, t2, data.fileDP);
-            List<DataPoint> points4 = DataPointOperations.Convol(1000, 2 * m + 1, t3, data.fileDP);
+            List<DataPoint> points1 = DataPointOperations.Convol(1000, 2 * m + 1, t, data.fileDP, 0.002);
+            List<DataPoint> points2 = DataPointOperations.Convol(1000, 2 * m + 1, t1, data.fileDP, 0.002);
+            List<DataPoint> points3 = DataPointOperations.Convol(1000, 2 * m + 1, t2, data.fileDP, 0.002);
+            List<DataPoint> points4 = DataPointOperations.Convol(1000, 2 * m + 1, t3, data.fileDP, 0.002);
+
+            //points1.RemoveRange(0, 128);
+            //points2.RemoveRange(0, 128);
+            //points3.RemoveRange(0, 128);
+            //points4.RemoveRange(0, 128);
 
             fff4.Model = BuildModel("Low Pass ", "", points1);
             fff3.Model = BuildModel("high Pass ", "", points2);
             fff2.Model = BuildModel("stroke ", "", points3);
             fff1.Model = BuildModel("reject ", "", points4);
 
-             a11 = new(points1, 1000);
-             a22 = new(points2, 1000);
-             a33 = new(points3, 1000);
-             a44 = new(points4, 1000);
+            a11 = new(points1, 1000/* - 128*/);
+            a22 = new(points2, 1000/* - 128*/);
+            a33 = new(points3, 1000/* - 128*/);
+            a44 = new(points4, 1000/* - 128*/);
 
 
-            ffff4.Model = BuildModel("Low Pass (only low frequency)", "", a11.SpectrFourier(500, 0));
-            ffff3.Model = BuildModel("high Pass (only high frequency)", "", a22.SpectrFourier(500, 0));
-            ffff2.Model = BuildModel("stroke (only middle frequency)", "", a33.SpectrFourier(500, 0));
-            ffff1.Model = BuildModel("reject (low and high frequency)", "", a44.SpectrFourier(500, 0));
+            ffff4.Model = BuildModel("Low Pass (only low frequency)", "", a11.SpectrFourier( /*(1000 - 128 ) / 2*/500, 0, 0.002));
+            ffff3.Model = BuildModel("high Pass (only high frequency)", "", a22.SpectrFourier(/*(1000 - 128) / 2*/500, 0, 0.002));
+            ffff2.Model = BuildModel("stroke (only middle frequency)", "", a33.SpectrFourier( /*(1000 - 128) / 2*/500, 0, 0.002));
+            ffff1.Model = BuildModel("reject (low and high frequency)", "", a44.SpectrFourier(/*(1000 - 128) / 2*/500, 0, 0.002));
         }
     }
 }
