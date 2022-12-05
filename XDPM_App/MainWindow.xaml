@@ -1,0 +1,1011 @@
+﻿<Window x:Class="XDPM_App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="900" Width="1200">
+    <Grid Background="#CBC7F9">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="110"/>
+        </Grid.ColumnDefinitions>
+        <TabControl Grid.Column="0">
+            <TabItem>
+                <TabItem.Header>
+                    Trend
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+
+                            <Grid Grid.Row="0" Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal1" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="PosLinTrendPlot" Grid.Column="0"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_T1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="0" Grid.Column="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal2" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="NegLinTrendPlot"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_T2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="2" Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal3" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="PosExpTrendPlot"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_T3" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="2" Grid.Column="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal4" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="NegExpTrendPlot"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_T4" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Noise
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+
+                            <Grid Grid.Row="0" Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal5" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="RandNoisePlot"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_N1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                            <Grid  Grid.Row="0" Grid.Column="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal6" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="MyRandNoisePlot"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_N2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="3" Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal7" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="ImpulseNoisePlot" Grid.Column="0"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_IN" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Harmonic
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal8" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="HarmPlot"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_H" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition x:Name="Anal9" Width="0.4*" MaxWidth="150"/>
+                                </Grid.ColumnDefinitions>
+                                <oxy:PlotView x:Name="PolyHarmPlot"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_PH" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Hist
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="5" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="3" Grid.RowSpan="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+                            <GridSplitter Grid.Row="3" Grid.ColumnSpan="5" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="TrendHist1" Grid.Column="0" Grid.Row="0"/>
+                            <oxy:PlotView x:Name="TrendHist2" Grid.Column="2" Grid.Row="0"/>
+                            <oxy:PlotView x:Name="TrendHist3" Grid.Column="4" Grid.Row="0"/>
+                            <oxy:PlotView x:Name="TrendHist4" Grid.Column="0" Grid.Row="2"/>
+                            <oxy:PlotView x:Name="NoiseHist1" Grid.Column="2" Grid.Row="2"/>
+                            <oxy:PlotView x:Name="NoiseHist2" Grid.Column="4" Grid.Row="2"/>
+                            <oxy:PlotView x:Name="ImpulseNoiseHist" Grid.Column="0" Grid.Row="4"/>
+                            <oxy:PlotView x:Name="HarmHist" Grid.Column="2" Grid.Row="4"/>
+                            <oxy:PlotView x:Name="PolyHarmHist" Grid.Column="4" Grid.Row="4"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    R
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="5" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="3" Grid.RowSpan="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+                            <GridSplitter Grid.Row="3" Grid.ColumnSpan="5" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="ACFHarmPlot" Grid.Column="0" Grid.Row="0"/>
+                            <oxy:PlotView x:Name="ACFNoisePlot" Grid.Column="2" Grid.Row="0"/>
+                            <oxy:PlotView x:Name="CCFNoisePlot"  Grid.Column="0" Grid.Row="2"/>
+                            <oxy:PlotView x:Name="CCFMyNoisePlot"  Grid.Column="2" Grid.Row="2"/>
+                            <oxy:PlotView x:Name="CCFHarmPlot"  Grid.Column="0" Grid.Row="4"/>
+                            <oxy:PlotView x:Name="TEST" Grid.Column="2" Grid.Row="4"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Spikes
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="SpikePlot1" Grid.Column="0" Grid.Row="0"/>
+                            <oxy:PlotView x:Name="SpikePlot2" Grid.Column="0" Grid.Row="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    AntiTrend
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <oxy:PlotView x:Name="AntiTrendPlot1" Grid.Column="0" Grid.Row="0"/>
+                            <oxy:PlotView x:Name="AntiTrendPlot2" Grid.Column="0" Grid.Row="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Fourier
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <oxy:PlotView x:Name="FourierPlot1" Grid.Column="0" Grid.Row="0"/>
+                            <oxy:PlotView  x:Name="FourierPlot2" Grid.Column="0" Grid.Row="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    ImplementNoise
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="3" ShowsPreview="False" Width="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" Background="DarkGray"/>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+
+                                <oxy:PlotView x:Name="ImplementPlot1" Grid.Row="0"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_1" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+
+                                <oxy:PlotView  x:Name="ImplementPlot2" Grid.Column="0"/>
+                                <StackPanel Grid.Column="1" Background="PaleGreen">
+                                    <DockPanel>
+                                        <TextBlock Text="Минимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="min_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Максимум" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="max_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Мат. ожидание" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="M_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Дисперсия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="D_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="СКО" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="SKO_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Ассиметрия" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="As_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Куртозис" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="K_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Стационарно?" HorizontalAlignment="Left"/>
+                                        <TextBlock x:Name="S_2" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <oxy:PlotView x:Name="ImplementPlot3" Grid.Column="2" Grid.RowSpan="3"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Cardio
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Row="3" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="LinearHeartPlot" Grid.Row="0"/>
+                            <oxy:PlotView  x:Name="HeartImpulsePlot" Grid.Row="2"/>
+                            <oxy:PlotView  x:Name="CardiogramaPlot" Grid.Row="4"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Filtres
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="f1" Grid.Row="0" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="f2" Grid.Row="2" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="f3" Grid.Row="0" Grid.Column="2"/>
+                            <oxy:PlotView  x:Name="f4" Grid.Row="2" Grid.Column="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Filtres
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="ff1" Grid.Row="0" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="ff2" Grid.Row="2" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="ff3" Grid.Row="0" Grid.Column="2"/>
+                            <oxy:PlotView  x:Name="ff4" Grid.Row="2" Grid.Column="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Files
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <oxy:PlotView  x:Name="FilePlot"/>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    FilesSpectr
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <oxy:PlotView  x:Name="FileSpectrPlot"/>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    13F
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="fff1" Grid.Row="0" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="fff2" Grid.Row="2" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="fff3" Grid.Row="0" Grid.Column="2"/>
+                            <oxy:PlotView  x:Name="fff4" Grid.Row="2" Grid.Column="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    13FSpectr
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Border BorderThickness="3" BorderBrush="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" ShowsPreview="False" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="DarkGray"/>
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray"/>
+
+                            <oxy:PlotView x:Name="ffff1" Grid.Row="0" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="ffff2" Grid.Row="2" Grid.Column="0"/>
+                            <oxy:PlotView  x:Name="ffff3" Grid.Row="0" Grid.Column="2"/>
+                            <oxy:PlotView  x:Name="ffff4" Grid.Row="2" Grid.Column="2"/>
+                        </Grid>
+                    </Border>
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
+
+        <ScrollViewer Grid.Column="1" MinWidth="110" VerticalScrollBarVisibility="Auto">
+            <StackPanel Background="LightCyan" x:Name="ParamPanel" >
+                <DockPanel>
+                    <TextBlock Text="N" FontSize="16" Width="20"/>
+                    <TextBox x:Name="TextBox_paramN" TextChanged="TextBox_paramN_TextChanged"/>
+                </DockPanel>
+                <Button Content="Начать" x:Name="NButton" Click="NClick"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="Тренды" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="a" FontSize="16" Width="20"/>
+                    <TextBox x:Name="TextBox_paramA" Text="0.1"/>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock Text="b" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_paramB" Text="1"/>
+                </DockPanel>
+                <Button Content="Построить" x:Name="BuildGraphButton" Click="BuildGraph" IsEnabled="False"/>
+                <!--<Button Content="Показать" Name="ShowGraphButton" Click="ShowGraph" IsEnabled="False"/>-->
+
+                <Separator Height="5"/>
+
+                <TextBlock Text="Шумы" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="R" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_NoiseparamR" Text="1"/>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock Text="IM N" FontSize="16" Width="40"/>
+                    <TextBox Name="TextBox_NoiseparamN" Text="10"/>
+                </DockPanel>
+                <Button Content="Построить" x:Name="BuildNoiseButton" Click="BuildNoise" IsEnabled="False"/>
+                <!--<Button Content="Показать" x:Name="ShowNoiseButton" Click="ShowNoise" IsEnabled="False"/>-->
+
+                <Separator Height="5"/>
+
+                <TextBlock Text="Гармоника" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="N" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_paramHarmN" Text="3"/>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock Text="Δt" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_paramDt" Text="0.001"/>
+                </DockPanel>
+                <Button Content="Окно параметров" x:Name="HarmWinButton" Click="OpenHarmWin" IsEnabled="True"/>
+                <Button Content="Построить" x:Name="BuildHarmButton" Click="BuildHarm" IsEnabled="False"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="Анализ" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="M" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_ParamM" Text="10"/>
+                </DockPanel>
+                <Button Content="Показать" x:Name="ShowAnalysisButton" Click="ShowAnalysis"/>
+                <Button Content="Скрыть/Показать" x:Name="HideAnalysisButton" Click="HideAnalysis"/>
+
+                <Separator Height="5"/>
+
+                <TextBlock Text="Гистограммы" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="Кол-во разб." FontSize="10" Width="60"/>
+                    <TextBox Name="TextBox_ParamHist" Text="10"/>
+                </DockPanel>
+                <Button Content="Построить" x:Name="HistButton" Click="HistClick"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="Смещение" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="C" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_ParamC" Text="10"/>
+                </DockPanel>
+                <Button Content="Сместить" x:Name="ShiftButton" Click="ShiftClick"/>
+                <Button Content="Центр рассеивания" x:Name="AntiShiftButton" Click="AntiShiftClick" IsEnabled="True"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="АКФ" HorizontalAlignment="Center"/>
+                <!--<DockPanel>
+                <TextBlock Text="C" FontSize="16" Width="20"/>
+                <TextBox Name="TextBox_ParamC" Text="10"/>
+            </DockPanel>-->
+                <Button Content="Построить" x:Name="ACFButton" Click="ACFClick" IsEnabled="true"/>
+
+                <TextBlock Text="ККФ" HorizontalAlignment="Center"/>
+                <Button Content="Запомнить" x:Name="SaveDataButton" Click="SaveDataClick" IsEnabled="true"/>
+                <Button Content="Построить" x:Name="CCFButton" Click="CCFClick" IsEnabled="true"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="Spikes" HorizontalAlignment="Center"/>
+                <Button Content="Построить" x:Name="SpikesButton" Click="BuildSpikes" IsEnabled="true"/>
+                <Button Content="Фильтрация" x:Name="FiltrButton" Click="Filtration" IsEnabled="true"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="АнтиТренд" HorizontalAlignment="Center"/>
+                <Button Content="Сумма" x:Name="_81Button" Click="BuildCombinedTrend" IsEnabled="true"/>
+                <Button Content="Лин" x:Name="_82Button" Click="DeleteLineareTrend" IsEnabled="true"/>
+                <DockPanel>
+                    <TextBlock Text="M" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_ParamMSpikes" Text="10"/>
+                </DockPanel>
+                <Button Content="Не Лин" x:Name="_83Button" Click="DeleteNonLineareTrend" IsEnabled="true"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="Fourier" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="L" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_ParamLFourier" Text="10"/>
+                </DockPanel>
+                <Button Content="Построить" Click="FourierClick"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="ImplementNoise" HorizontalAlignment="Center"/>
+                <DockPanel>
+                    <TextBlock Text="M" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_M" TextChanged="TextBox_M_TextChanged"/>
+                </DockPanel>
+                <Button Content="Построить" Click="BuildImplementsClick"/>
+                <Button Content="Усреднить" x:Name="ImpButton" Click="ImplementsAverageClick" IsEnabled="False"/>
+                <Button Content="Анализ" Click="ImplementMDependenceClick"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <TextBlock Text="Cardio" HorizontalAlignment="Center"/>
+                <!--<DockPanel>
+                    <TextBlock Text="M" FontSize="16" Width="20"/>
+                    <TextBox Name="TextBox_" TextChanged="TextBox_M_TextChanged"/>
+                </DockPanel>-->
+                <Button Content="1" Click="Click11_3_a"/>
+                <Button Content="2" Click="Click11_3_b"/>
+                <Button Content="3" Click="Click11_3_c"/>
+
+                <Separator Height="10" Background="Black"/>
+
+                <Button Content="3" Click="Click12_2"/>
+                <Button Content="3" Click="Click12_3"/>
+                <Button Content="Open File" Click="FileClick"/>
+                <Button Content="13" Click="Click13"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
