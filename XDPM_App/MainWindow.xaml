@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1200">
+        Title="MainWindow" Height="1000" Width="1200">
     <Grid Background="#CBC7F9">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="9*"/>
