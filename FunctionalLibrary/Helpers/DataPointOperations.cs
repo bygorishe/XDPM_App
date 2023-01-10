@@ -10,24 +10,24 @@ namespace XDPM_App.Common
         /// Summarize number to all datapoints
         /// </summary>
         /// <param name="dataPoints"></param>
-        /// <param name="t"></param>
-        public static void SumPointsWithVar(ref List<DataPoint> dataPoints, double t)
+        /// <param name="number"></param>
+        public static void SumPointsWithNumber(ref List<DataPoint> dataPoints, double number)
         {
             int N = dataPoints.Count;
             for (int i = 0; i < N; i++)
-                dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y + t);
+                dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y + number);
         }
 
         /// <summary>
         /// Multiply datapoints with amber
         /// </summary>
         /// <param name="dataPoints"></param>
-        /// <param name="t"></param>
-        public static void MultPointsWithVar(ref List<DataPoint> dataPoints, double t)
+        /// <param name="number"></param>
+        public static void MultPointsWithNumber(ref List<DataPoint> dataPoints, double number)
         {
             int N = dataPoints.Count;
             for (int i = 0; i < N; i++)
-                dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y * t);
+                dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y * number);
         }
 
         /// <summary>
@@ -39,15 +39,15 @@ namespace XDPM_App.Common
         {
             int N = dataPoints[0].Count;
             List<double> y = new(N);
-            List<DataPoint> dataPointsT = new(N);
+            List<DataPoint> newDataPoints = new(N);
             for (int i = 0; i < N; i++)
                 y.Add(0);
-            foreach (var c in dataPoints)
+            foreach (var list in dataPoints)
                 for (int i = 0; i < N; i++)
-                    y[i] += c[i].Y;
+                    y[i] += list[i].Y;
             for (int i = 0; i < N; i++)
-                dataPointsT.Add(new DataPoint(dataPoints[0][i].X, y[i]));
-            return dataPointsT;
+                newDataPoints.Add(new DataPoint(dataPoints[0][i].X, y[i]));
+            return newDataPoints;
         }
 
 
@@ -60,15 +60,15 @@ namespace XDPM_App.Common
         {
             int N = dataPoints[0].Count;
             List<double> y = new(N);
-            List<DataPoint> dataPointsT = new(N);
+            List<DataPoint> newDataPoints = new(N);
             for (int i = 0; i < N; i++)
                 y.Add(1);
-            foreach (var c in dataPoints)
+            foreach (var list in dataPoints)
                 for (int i = 0; i < N; i++)
-                    y[i] *= c[i].Y;
+                    y[i] *= list[i].Y;
             for (int i = 0; i < N; i++)
-                dataPointsT.Add(new DataPoint(dataPoints[0][i].X, y[i]));
-            return dataPointsT;
+                newDataPoints.Add(new DataPoint(dataPoints[0][i].X, y[i]));
+            return newDataPoints;
         }
 
 
@@ -88,7 +88,7 @@ namespace XDPM_App.Common
         {
             int N = dataPoints.Count;
             double max = dataPoints.Select(x => x.Y).Max();
-            MultPointsWithVar(ref dataPoints, 1 / max);
+            MultPointsWithNumber(ref dataPoints, 1 / max);
         }
 
         /// <summary>
@@ -96,21 +96,28 @@ namespace XDPM_App.Common
         /// </summary>
         /// <param name="N">Datapoints lenght</param>
         /// <param name="M"></param>
-        /// <param name="l1">First datapoint's list</param>
-        /// <param name="l2">Second datapoint's list</param>
+        /// <param name="dataPoints1">First datapoint's list</param>
+        /// <param name="dataPoints2">Second datapoint's list</param>
         /// <param name="delta_t">Sampling interval</param>
         /// <returns></returns>
-        public static List<DataPoint> Convol(int N, int M, List<DataPoint> l1, List<DataPoint> l2, double delta_t = 0.001) //свертка
+        public static List<DataPoint> Convol(int N, int M, List<DataPoint> dataPoints1, List<DataPoint> dataPoints2) //свертка
         {
-            List<DataPoint> tl = new(N);
+            List<DataPoint> newDataPoints = new(N);
             for (int i = 0; i < N; i++)
             {
-                double temp = 0;
+                double sum = 0;
                 for (int m = 0, t = i - m; m < M && t >= 0; m++, t--)
-                    temp += l1[m].Y * l2[i - m].Y;
-                tl.Add(new DataPoint(i * delta_t, temp));
+                    sum += dataPoints1[m].Y * dataPoints2[i - m].Y;
+                newDataPoints.Add(new DataPoint(dataPoints2[i].X, sum));
             }
-            return tl;
+            return newDataPoints;
+        }
+
+        public static List<DataPoint> RangeOf(List<DataPoint> dataPoints, int index, int count)
+        {
+            DataPoint[] newDataPoints = new DataPoint[count];
+            dataPoints.CopyTo(index, newDataPoints, 0, count);
+            return newDataPoints.ToList();
         }
     }
 }

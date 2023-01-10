@@ -4,14 +4,19 @@ namespace XDPM_App.Common
 {
     public class MyRandom
     {
-        int seed;
+        private int _seed;
 
         /// <summary>
         /// Init random
         /// </summary>
         public MyRandom()
         {
-            seed = DateTime.Now.Millisecond;
+            _seed = DateTime.Now.Millisecond;
+        }
+
+        public MyRandom(int seed)
+        {
+            _seed = seed;
         }
 
         /// <summary>
@@ -20,9 +25,9 @@ namespace XDPM_App.Common
         /// <returns></returns>
         public int Next()
         {
-            seed ^= seed >> 5;
-            seed ^= seed << 7;
-            return seed;
+            _seed ^= _seed >> 5;
+            _seed ^= _seed << 7;
+            return _seed;
         }
     }
 }

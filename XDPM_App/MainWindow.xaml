@@ -11,8 +11,8 @@
             <ColumnDefinition Width="9*"/>
             <ColumnDefinition Width="110"/>
         </Grid.ColumnDefinitions>
-        <TabControl Grid.Column="0">
-            <TabItem>
+        <TabControl x:Name="MainTabControl" Grid.Column="0">
+            <!--<TabItem>
                 <TabItem.Header>
                     Trend
                 </TabItem.Header>
@@ -856,7 +856,7 @@
                         </Grid>
                     </Border>
                 </TabItem.Content>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
 
         <ScrollViewer Grid.Column="1" MinWidth="110" VerticalScrollBarVisibility="Auto">
@@ -865,11 +865,13 @@
                     <TextBlock Text="N" FontSize="16" Width="20"/>
                     <TextBox x:Name="TextBox_paramN" TextChanged="TextBox_paramN_TextChanged"/>
                 </DockPanel>
-                <Button Content="Начать" x:Name="NButton" Click="NClick"/>
+                <Button Content="Начать" x:Name="NButton" Click="CreateTabItem"/>
 
                 <Separator Height="10" Background="Black"/>
 
-                <TextBlock Text="Тренды" HorizontalAlignment="Center"/>
+                <Button Content="New s" x:Name = "CreateTabItemButton" Click="CreateTabItem"/>
+
+                <!--<TextBlock Text="Тренды" HorizontalAlignment="Center"/>
                 <DockPanel>
                     <TextBlock Text="a" FontSize="16" Width="20"/>
                     <TextBox x:Name="TextBox_paramA" Text="0.1"/>
@@ -879,7 +881,8 @@
                     <TextBox Name="TextBox_paramB" Text="1"/>
                 </DockPanel>
                 <Button Content="Построить" x:Name="BuildGraphButton" Click="BuildGraph" IsEnabled="False"/>
-                <!--<Button Content="Показать" Name="ShowGraphButton" Click="ShowGraph" IsEnabled="False"/>-->
+                <Button Content="Показать" Name="ShowGraphButton" Click="ShowGraph" IsEnabled="False"/>
+                
 
                 <Separator Height="5"/>
 
@@ -893,7 +896,9 @@
                     <TextBox Name="TextBox_NoiseparamN" Text="10"/>
                 </DockPanel>
                 <Button Content="Построить" x:Name="BuildNoiseButton" Click="BuildNoise" IsEnabled="False"/>
+                -->
                 <!--<Button Content="Показать" x:Name="ShowNoiseButton" Click="ShowNoise" IsEnabled="False"/>-->
+                <!--
 
                 <Separator Height="5"/>
 
@@ -941,10 +946,12 @@
                 <Separator Height="10" Background="Black"/>
 
                 <TextBlock Text="АКФ" HorizontalAlignment="Center"/>
+                -->
                 <!--<DockPanel>
                 <TextBlock Text="C" FontSize="16" Width="20"/>
                 <TextBox Name="TextBox_ParamC" Text="10"/>
             </DockPanel>-->
+                <!--
                 <Button Content="Построить" x:Name="ACFButton" Click="ACFClick" IsEnabled="true"/>
 
                 <TextBlock Text="ККФ" HorizontalAlignment="Center"/>
@@ -991,10 +998,12 @@
                 <Separator Height="10" Background="Black"/>
 
                 <TextBlock Text="Cardio" HorizontalAlignment="Center"/>
+                -->
                 <!--<DockPanel>
                     <TextBlock Text="M" FontSize="16" Width="20"/>
                     <TextBox Name="TextBox_" TextChanged="TextBox_M_TextChanged"/>
                 </DockPanel>-->
+                <!--
                 <Button Content="1" Click="Click11_3_a"/>
                 <Button Content="2" Click="Click11_3_b"/>
                 <Button Content="3" Click="Click11_3_c"/>
@@ -1004,7 +1013,7 @@
                 <Button Content="3" Click="Click12_2"/>
                 <Button Content="3" Click="Click12_3"/>
                 <Button Content="Open File" Click="FileClick"/>
-                <Button Content="13" Click="Click13"/>
+                <Button Content="13" Click="Click13"/>-->
             </StackPanel>
         </ScrollViewer>
     </Grid>

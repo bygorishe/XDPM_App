@@ -1,6 +1,5 @@
 ﻿using XDPM_App.Common;
 using OxyPlot;
-using System;
 using System.Collections.Generic;
 using static System.Math;
 
@@ -15,7 +14,7 @@ namespace XDPM_App.ADMP
         /// <param name="M">Correcting number</param>
         public static void AntiShift(ref List<DataPoint> dataPoints, double M)
         {
-            DataPointOperations.SumPointsWithVar(ref dataPoints, -M);
+            DataPointOperations.SumPointsWithNumber(ref dataPoints, -M);
         }
 
         /// <summary>
@@ -27,17 +26,17 @@ namespace XDPM_App.ADMP
         {
             for (int i = 0; i < dataPoints.Count; i++)
             {
-                if (Math.Abs(dataPoints[i].Y) > R && i != 0 && i != dataPoints.Count - 1)
+                if (Abs(dataPoints[i].Y) > R && i != 0 && i != dataPoints.Count - 1)
                 {
-                    double t = (dataPoints[i - 1].Y + dataPoints[i + 1].Y) / 2;
-                    dataPoints[i] = new DataPoint(i, t);
+                    double value = (dataPoints[i - 1].Y + dataPoints[i + 1].Y) / 2;
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, value);
                 }
                 else if (i == 0)
-                    dataPoints[i] = new DataPoint(i, dataPoints[i + 1].Y / 2);
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i + 1].Y / 2);
                 else if (i == dataPoints.Count - 1)
-                    dataPoints[i] = new DataPoint(i, dataPoints[i - 1].Y / 2);
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i - 1].Y / 2);
                 else
-                    dataPoints[i] = new DataPoint(i, dataPoints[i].Y);
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y);
             }
         }
 
@@ -48,7 +47,20 @@ namespace XDPM_App.ADMP
         public static void AntiTrendLinear(ref List<DataPoint> dataPoints)
         {
             for (int i = 0; i < dataPoints.Count - 1; i++)
-                dataPoints[i] = new DataPoint(i, dataPoints[i + 1].Y - dataPoints[i].Y);
+                dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i + 1].Y - dataPoints[i].Y);
+        }
+
+        public static void MovingAverage(int W, ref List<DataPoint> dataPoints)
+        {
+            for (int i = 0; i < dataPoints.Count / W; i++)
+            {
+                double average = 0;
+                for (int j = i * W; j < (i + 1) * W; j++)
+                    average += dataPoints[j].Y;
+                average /= W;
+                for (int j = i * W; j < (i + 1) * W; j++)
+                    dataPoints[j] = new DataPoint(dataPoints[j].X, average);
+            }
         }
 
         /// <summary>
@@ -58,41 +70,36 @@ namespace XDPM_App.ADMP
         /// <param name="dataPoints"></param>
         public static void AntiTrendNonLinear(int W, ref List<DataPoint> dataPoints)
         {
-            for (int i = 0; i < dataPoints.Count / W; i++)
-            {
-                double average = 0;
-                for (int j = i * W; j < (i + 1) * W; j++)
-                    average += dataPoints[j].Y;
-                average /= W;
-                for (int j = i * W; j < (i + 1) * W; j++)
-                    dataPoints[j] = new DataPoint(j, dataPoints[j].Y - average);
-            }
+            List<DataPoint> tempDataPoints = new(dataPoints.Count);
+            MovingAverage(W, ref tempDataPoints);
+            for (int i = 0; i < dataPoints.Count; i++)
+                dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y - tempDataPoints[i].Y);
         }
 
-        public static List<DataPoint> ImplementationMNoise(int M, int N, List<DataPoint>? datas = null, double R = 1)
+        public static List<DataPoint> ImplementationMNoise(int M, int N, List<DataPoint>? dataPoints = null, double R = 1)
         {
-            List<DataPoint> dataPoints = new(N);
+            List<DataPoint> newDataPoints = new(N);
             for (int j = 0; j < N; j++)
-                dataPoints.Add(new DataPoint(0, 0));
-            if (datas == null)
+                newDataPoints.Add(new DataPoint(0, 0));
+            if (dataPoints == null)
                 for (int i = 0; i < M; i++)
                 {
                     List<DataPoint> temp = Model.RandomNoiseTrend(N, R);
-                    dataPoints = DataPointOperations.SumPoints(temp, dataPoints);
+                    newDataPoints = DataPointOperations.SumPoints(temp, newDataPoints);
                 }
             else
                 for (int i = 0; i < M; i++)
                 {
                     List<DataPoint> temp = Model.RandomNoiseTrend(N, R);
-                    dataPoints = DataPointOperations.SumPoints(temp, dataPoints, datas);
+                    newDataPoints = DataPointOperations.SumPoints(temp, newDataPoints, dataPoints);
                 }
-            return dataPoints;
+            return newDataPoints;
         }
 
         public static List<DataPoint> AntiNoise(int M, int N, List<DataPoint> dataPoints)
         {
             for (int j = 0; j < N; j++)
-                dataPoints[j] = new DataPoint(j, dataPoints[j].Y / M);
+                dataPoints[j] = new DataPoint(dataPoints[j].X, dataPoints[j].Y / M);
             return dataPoints;
         }
 
@@ -118,7 +125,7 @@ namespace XDPM_App.ADMP
                 lpw[i] /= sumG;
 
             lpw.Reverse();
-            for (int i = m-1; i >= 0; i--)
+            for (int i = m - 1; i >= 0; i--)
                 lpw.Add(lpw[i]);
         }
 
@@ -140,7 +147,7 @@ namespace XDPM_App.ADMP
                 bpw.Add(lpw2[k] - lpw1[k]);
         }
 
-        public static void rejectFilter(double fc1, double fc2, double delta_t, int m, ref List<double> bsw)
+        public static void RejectFilter(double fc1, double fc2, double delta_t, int m, ref List<double> bsw)
         {
             List<double> lpw1 = new(2 * m + 1);
             List<double> lpw2 = new(2 * m + 1);

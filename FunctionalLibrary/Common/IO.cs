@@ -7,9 +7,9 @@ using System.Linq;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
-namespace XDPM_App.Common
+namespace FunctionalLibrary.Common
 {
-    public static class InOut
+    public static class IO
     {
         /// <summary>
         /// Select file
@@ -26,7 +26,7 @@ namespace XDPM_App.Common
             switch (fileExtension)
             {
                 case ".dat":
-                        return ReadBinFile(path, out rate, delta_t, doubleAccuracy);
+                    return ReadBinFile(path, out rate, delta_t, doubleAccuracy);
                 case ".wav":
                     return ReadWavFile(path, out rate);
                 case ".txt":
@@ -53,10 +53,7 @@ namespace XDPM_App.Common
                     if (!doubleAccuracy)
                     {
                         while (true) //file too smal and cant use peekchar
-                        {
-                            float value = binaryReader.ReadSingle();
-                            points.Add(new DataPoint(i++ * delta_t, value));
-                        }
+                            points.Add(new DataPoint(i++ * delta_t, binaryReader.ReadSingle()));
                     }
                     else
                         while (true)
@@ -142,7 +139,7 @@ namespace XDPM_App.Common
                     WriteTxtFile(list, path);
                     break;
                 case ".wav":
-                    
+
                     break;
             }
         }
