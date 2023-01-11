@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using static System.Math;
 using OxyPlot.Axes;
+using System.Linq;
 
 namespace XDPM_App.ADMP
 {
@@ -44,6 +45,37 @@ namespace XDPM_App.ADMP
                 MarkerType = markerType
             };
             series.Points.AddRange(dataPoints);
+            plotModel.Series.Add(series);
+            return plotModel;
+        }
+
+        public static PlotModel BuildHistModel(string plotName, string seriesName, List<DataPoint> dataPoints, int barCount = 10, MarkerType markerType = MarkerType.None)
+        {
+            var valueList = DataPointOperations.GetValue(dataPoints);
+            double min = valueList.Min();
+            double max = valueList.Max();
+            double step = (max - min) / barCount;
+            List<double> ranges = new(barCount + 1);
+            List<HistogramItem> bars = new(barCount + 1);
+            List<int> count = new(barCount);
+            PlotModel plotModel = new() { Title = plotName };
+            for (int i = 0; i < barCount; i++)
+            {
+                ranges.Add(min + step * i);
+                count.Add(0);
+            }
+            ranges.Add(min + step * barCount);
+            foreach (var value in valueList)
+                for (int i = 0; i < barCount; i++)
+                    if (ranges[i] <= value && value <= ranges[i + 1])
+                    {
+                        count[i]++;
+                        break;
+                    }
+            for (int i = 0; i < barCount; i++)
+                bars.Add(new HistogramItem(ranges[i], ranges[i + 1], count[i] * (ranges[i + 1] - ranges[i]), count[i]));
+            HistogramSeries series = new() { StrokeThickness = 1 };
+            series.Items.AddRange(bars);
             plotModel.Series.Add(series);
             return plotModel;
         }

@@ -28,20 +28,20 @@ namespace XDPM_App
             InitializeComponent();
 
             Data yandex = new ();
-            yandex.DataPoints = IO.Read(file: "C:\\Users\\angry\\Desktop\\YNDX_170101_220101.txt");
+            IO.Read(yandex, file: "C:\\Users\\angry\\Desktop\\YNDX_170101_220101.txt");
             YndxPlot.Model = BuildDateModel("YNDX", "", yandex.DataPoints);
 
-            Data aflt = new(1263);
-            aflt.DataPoints = IO.Read(file: "C:\\Users\\angry\\Desktop\\AFLT_170101_220101.txt");
+            Data aflt = new();
+            IO.Read(aflt, file: "C:\\Users\\angry\\Desktop\\AFLT_170101_220101.txt");
             AfltPlot.Model = BuildDateModel("AFLT", "", aflt.DataPoints);
 
-            Data sber = new(1263);
-            sber.DataPoints = IO.Read(file: "C:\\Users\\angry\\Desktop\\SBER_170101_220101.txt");
+            Data sber = new();
+            IO.Read(sber, file: "C:\\Users\\angry\\Desktop\\SBER_170101_220101.txt");
             SberPlot.Model = BuildDateModel("SBER", "", sber.DataPoints);
 
-            Data data = new Data(1000);
-            data.DataPoints = IO.Read();
-            SomePlot.Model = BuildModel("","",data.DataPoints);
+            Data data = new ();
+            IO.Read(data);
+            SomePlot.Model = BuildHistModel("","",data.DataPoints);
         }
 
         ComboBox comboBox = new ComboBox

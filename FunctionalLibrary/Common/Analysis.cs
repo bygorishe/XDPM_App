@@ -1,6 +1,5 @@
 ﻿using XDPM_App.Common;
 using OxyPlot;
-using OxyPlot.Series;
 using System.Collections.Generic;
 using System.Linq;
 using static System.Math;
@@ -108,34 +107,6 @@ namespace XDPM_App.ADMP
                 //    return false;
             }
             return true;
-        }
-
-        public PlotModel Hist(string name)
-        {
-            double step = (Max - Min) / _analysisSpan;
-            List<double> ranges = new(_analysisSpan + 1);
-            List<HistogramItem> bars = new(_analysisSpan + 1);
-            List<int> count = new(_analysisSpan);
-            PlotModel plotModel = new() { Title = name };
-            for (int i = 0; i < _analysisSpan; i++)
-            {
-                ranges.Add(Min + step * i);
-                count.Add(0);
-            }
-            ranges.Add(Min + step * _analysisSpan);
-            foreach (var c in _valueList)
-                for (int i = 0; i < _analysisSpan; i++)
-                    if (ranges[i] <= c && c <= ranges[i + 1])
-                    {
-                        count[i]++;
-                        break;
-                    }
-            for (int i = 0; i < _analysisSpan; i++)
-                bars.Add(new HistogramItem(ranges[i], ranges[i + 1], count[i] * (ranges[i + 1] - ranges[i]), count[i]));
-            HistogramSeries series = new() { StrokeThickness = 1 };
-            series.Items.AddRange(bars);
-            plotModel.Series.Add(series);
-            return plotModel;
         }
 
         private double Rxx(int L)

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
+using XDPM_App.ADMP;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -18,7 +18,7 @@ namespace FunctionalLibrary.Common
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static List<DataPoint> Read(double delta_t = 0.001, bool doubleAccuracy = false, string? file = null, int rate = -1, bool isDate = false)
+        public static void Read(Data data, double delta_t = 0.001, bool doubleAccuracy = false, string? file = null, int rate = -1, bool isDate = false)
         {
             string path;
             if (file == null)
@@ -33,15 +33,18 @@ namespace FunctionalLibrary.Common
             switch (fileExtension)
             {
                 case ".dat":
-                    return ReadBinFile(path, delta_t, doubleAccuracy);
+                    ReadBinFile(data, path, delta_t, doubleAccuracy);
+                    break;
                 case ".wav":
-                    return ReadWavFile(path, out rate);
+                    ReadWavFile(data, path);
+                    break;
                 case ".txt":
                     {
                         //if(isDate)
-                            return ReadDateTxtFile(path);
+                        ReadDateTxtFile(data, path);
                         //else
                         //    return ReadTxtFile(path, delta_t);
+                        break;
                     }
                 default:
                     throw new Exception("cant read this file format");
@@ -54,55 +57,39 @@ namespace FunctionalLibrary.Common
         /// <param name="delta_t">Sampling interval</param>
         /// <param name="doubleAccuracy">If need douuble instead float</param>
         /// <returns></returns>
-        private static List<DataPoint> ReadBinFile(string path, double delta_t, bool doubleAccuracy)
+        private static void ReadBinFile(Data data, string path, double delta_t, bool doubleAccuracy)
         {
-            List<DataPoint> points = new();
-            using (BinaryReader binaryReader = new(File.Open(path, FileMode.Open)))
-            {
-                try
-                {
-                    int i = 0;
-                    if (!doubleAccuracy)
-                    {
-                        while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length) //file too smal and cant use peekchar
-                            points.Add(new DataPoint(i++ * delta_t, binaryReader.ReadSingle()));
-                    }
-                    else
-                        while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
-                            points.Add(new DataPoint(i++, binaryReader.ReadDouble()));
-                }
-                catch (EndOfStreamException)
-                {
-
-                }
-            }
-            return points;
+            data.DataPoints = new();
+            using BinaryReader binaryReader = new(File.Open(path, FileMode.Open));
+            int i = 0;
+            if (!doubleAccuracy)
+                while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length) //file too smal and cant use peekchar
+                    data.DataPoints.Add(new DataPoint(i++ * delta_t, binaryReader.ReadSingle()));
+            else
+                while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
+                    data.DataPoints.Add(new DataPoint(i++, binaryReader.ReadDouble()));
+            data.N = i;
         }
 
-        private static List<DataPoint> ReadDateTxtFile(string path)
+        private static void ReadDateTxtFile(Data data, string path)
         {
-            List<DataPoint> points = new();
+            data.DataPoints = new();
             using (StreamReader streamReader = new(File.Open(path, FileMode.Open)))
             {
-                try
+                string? inString;
+                int i = 0;
+                while (!string.IsNullOrEmpty(inString = streamReader.ReadLine()))
                 {
-                    string? inString;
-                    while (!string.IsNullOrEmpty(inString = streamReader.ReadLine()))
-                    {
-                        string[] str = inString.Split("\t");
-                        double value = Convert.ToDouble(str[2].Replace('.', ','));
-                        var time = DateTime.Parse(str[0]);
-                        //var day = new DateTime(int.Parse(date[2]), int.Parse(date[1]), int.Parse(date[0])); ;
-                        double timeToDouble = DateTimeAxis.ToDouble(time);
-                        points.Add(new DataPoint(timeToDouble, value));
-                    }
+                    string[] str = inString.Split("\t");
+                    double value = Convert.ToDouble(str[2].Replace('.', ','));
+                    var time = DateTime.Parse(str[0]);
+                    //var day = new DateTime(int.Parse(date[2]), int.Parse(date[1]), int.Parse(date[0])); ;
+                    double timeToDouble = DateTimeAxis.ToDouble(time);
+                    data.DataPoints.Add(new DataPoint(timeToDouble, value));
+                    i++;
                 }
-                catch (EndOfStreamException)
-                {
-
-                }
+                data.N = i;
             }
-            return points;
         }
 
         // боже храни тебя господьб найдено и честно позаимствованое
@@ -123,13 +110,20 @@ namespace FunctionalLibrary.Common
             return (audio, sampleRate);
         }
 
-        private static List<DataPoint> ReadWavFile(string path, out int sampleRate)
+        private static void ReadWavFile(Data data, string path)
         {
-            List<DataPoint> points = new();
-            (List<double> t, sampleRate) = ReadMono(path);
-            for (int i = 0; i < t.Count; i++)
-                points.Add(new DataPoint(i, t[i]));
-            return points;
+            if (data is WavData wavData)
+            {
+                wavData.DataPoints = new();
+                (List<double> t, int sampleRate) = ReadMono(path);
+                int i = 0;
+                for (; i < t.Count; i++)
+                    wavData.DataPoints.Add(new DataPoint(i, t[i]));
+                wavData.N = i;
+                wavData.Rate = sampleRate;
+            }
+            else
+                throw new Exception("Not wav Data");
         }
 
         public static void Write(List<DataPoint> list)
