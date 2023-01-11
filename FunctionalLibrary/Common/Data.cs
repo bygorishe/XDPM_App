@@ -28,69 +28,97 @@ namespace XDPM_App.ADMP
                 throw new Exception("Incorrect data");
         }
 
-        public Data(int N) : this(N, (++s_count).ToString())
-        { }
+        public Data(int N) : this(N, (++s_count).ToString()) { }
+
+        public Data()
+        {
+            DataPoints = new List<DataPoint>();
+        }
+
+        public void CalculateN()
+        {
+            N = DataPoints.Count;
+        }
     }
 
     public class SimpleTrendData : Data
     {
         public double a;
         public double b;
+
         public SimpleTrendData(int N, string Name, double a, double b) : base(N, Name)
         {
             this.a = a;
             this.b = b;
         }
+
         public SimpleTrendData(int N, double a, double b) : base(N)
         {
             this.a = a;
             this.b = b;
         }
+
+        public SimpleTrendData() : base() { }
     }
 
     public class NoiseData : Data
     {
         public int IN_N; //кол-во импульсов
         public double R; //аплитуда шум
+
         public NoiseData(int N, string Name, double r, int iN_N = 0) : base(N, Name)
         {
             IN_N = iN_N;
             R = r;
         }
+
         public NoiseData(int N, double r, int iN_N = 0) : base(N)
         {
             IN_N = iN_N;
             R = r;
         }
+
+        public NoiseData() : base() { }
     }
 
     public class HarmonicData : Data
     {
         public List<HarmParam> Param;
+
         public HarmonicData(int N, string Name, params HarmParam[] param) : base(N, Name)
         {
             Param = new List<HarmParam>(param.Length);
             foreach (var p in param)
                 Param.Add(p);
         }
+
         public HarmonicData(int N, params HarmParam[] param) : base(N)
         {
             Param = new List<HarmParam>(param.Length);
             foreach (var p in param)
                 Param.Add(p);
         }
+
+        public HarmonicData() : base() 
+        {
+            Param = new List<HarmParam>();
+        }
     }
 
     public class WavData : Data
     {
         public int Rate;
+
         public WavData(int N, string Name) : base(N, Name)
         {
 
         }
+
         public WavData(int N) : base(N)
         {
 
         }
+
+        public WavData() : base() { }
     }
 }

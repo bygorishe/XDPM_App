@@ -1,9 +1,11 @@
 ﻿using NAudio.Wave;
 using OxyPlot;
+using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -16,21 +18,31 @@ namespace FunctionalLibrary.Common
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static List<DataPoint> Read(out int rate, double delta_t = 0.001, bool doubleAccuracy = false)
+        public static List<DataPoint> Read(double delta_t = 0.001, bool doubleAccuracy = false, string? file = null, int rate = -1, bool isDate = false)
         {
-            OpenFileDialog openFileDialog = new();
-            if (openFileDialog.ShowDialog() == false)
-                throw new Exception("File not found");
-            string path = openFileDialog.FileName;
+            string path;
+            if (file == null)
+            {
+                OpenFileDialog openFileDialog = new();
+                if (openFileDialog.ShowDialog() == false)
+                    throw new Exception("File not found");
+                path = openFileDialog.FileName;
+            }
+            else path = file;
             string fileExtension = Path.GetExtension(path);
             switch (fileExtension)
             {
                 case ".dat":
-                    return ReadBinFile(path, out rate, delta_t, doubleAccuracy);
+                    return ReadBinFile(path, delta_t, doubleAccuracy);
                 case ".wav":
                     return ReadWavFile(path, out rate);
                 case ".txt":
-                    return ReadTxtFile(path, out rate, delta_t);
+                    {
+                        //if(isDate)
+                            return ReadDateTxtFile(path);
+                        //else
+                        //    return ReadTxtFile(path, delta_t);
+                    }
                 default:
                     throw new Exception("cant read this file format");
             }
@@ -42,7 +54,7 @@ namespace FunctionalLibrary.Common
         /// <param name="delta_t">Sampling interval</param>
         /// <param name="doubleAccuracy">If need douuble instead float</param>
         /// <returns></returns>
-        private static List<DataPoint> ReadBinFile(string path, out int rate, double delta_t, bool doubleAccuracy)
+        private static List<DataPoint> ReadBinFile(string path, double delta_t, bool doubleAccuracy)
         {
             List<DataPoint> points = new();
             using (BinaryReader binaryReader = new(File.Open(path, FileMode.Open)))
@@ -52,11 +64,11 @@ namespace FunctionalLibrary.Common
                     int i = 0;
                     if (!doubleAccuracy)
                     {
-                        while (true) //file too smal and cant use peekchar
+                        while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length) //file too smal and cant use peekchar
                             points.Add(new DataPoint(i++ * delta_t, binaryReader.ReadSingle()));
                     }
                     else
-                        while (true)
+                        while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
                             points.Add(new DataPoint(i++, binaryReader.ReadDouble()));
                 }
                 catch (EndOfStreamException)
@@ -64,24 +76,25 @@ namespace FunctionalLibrary.Common
 
                 }
             }
-            //fix
-            rate = 1;
-
             return points;
         }
 
-        private static List<DataPoint> ReadTxtFile(string path, out int rate, double delta_t)
+        private static List<DataPoint> ReadDateTxtFile(string path)
         {
             List<DataPoint> points = new();
             using (StreamReader streamReader = new(File.Open(path, FileMode.Open)))
             {
                 try
                 {
-                    int i = 0;
-                    while (true)
+                    string? inString;
+                    while (!string.IsNullOrEmpty(inString = streamReader.ReadLine()))
                     {
-                        double value = streamReader.Read();
-                        points.Add(new DataPoint(i++ * delta_t, value));
+                        string[] str = inString.Split("\t");
+                        double value = Convert.ToDouble(str[2].Replace('.', ','));
+                        var time = DateTime.Parse(str[0]);
+                        //var day = new DateTime(int.Parse(date[2]), int.Parse(date[1]), int.Parse(date[0])); ;
+                        double timeToDouble = DateTimeAxis.ToDouble(time);
+                        points.Add(new DataPoint(timeToDouble, value));
                     }
                 }
                 catch (EndOfStreamException)
@@ -89,9 +102,6 @@ namespace FunctionalLibrary.Common
 
                 }
             }
-            //fix
-            rate = 1;
-
             return points;
         }
 

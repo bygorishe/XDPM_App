@@ -18,7 +18,7 @@ namespace XDPM_App
 
             this.n = N;
             this.data = data;
-            data.HarmParams = new(n);
+            //data.HarmParams = new(n);
             listA = new(n);
             listf = new(n);
             for (int i = 0; i < n; i++)
@@ -56,14 +56,14 @@ namespace XDPM_App
         {
             for (int i = 0; i < n; i++)
             {
-                if (double.TryParse(listA[i].Text, out double value1)
-                    && double.TryParse(listf[i].Text, out double value2))
-                    data.HarmParams.Add(new Common.HarmParam(value1, value2));
-                else
-                {
-                    MessageBox.Show("Не верны параметры");
-                    break;
-                }
+                //if (double.TryParse(listA[i].Text, out double value1)
+                //    && double.TryParse(listf[i].Text, out double value2))
+                //    data.HarmParams.Add(new Common.HarmParam(value1, value2));
+                //else
+                //{
+                //    MessageBox.Show("Не верны параметры");
+                //    break;
+                //}
             }
         }
 

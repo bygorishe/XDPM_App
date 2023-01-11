@@ -8,6 +8,9 @@ using static XDPM_App.ADMP.Model;
 using System.Windows.Input;
 using System;
 using System.Windows.Media;
+using FunctionalLibrary.Common;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 
 namespace XDPM_App
 {
@@ -23,8 +26,22 @@ namespace XDPM_App
         public MainWindow()
         {
             InitializeComponent();
-            comboBox.DropDownOpened += ComboBox_DropDownOpened;
-            MainTabControl.MouseRightButtonUp += ComboBox_MouseRightButtonUp;
+
+            Data yandex = new ();
+            yandex.DataPoints = IO.Read(file: "C:\\Users\\angry\\Desktop\\YNDX_170101_220101.txt");
+            YndxPlot.Model = BuildDateModel("YNDX", "", yandex.DataPoints);
+
+            Data aflt = new(1263);
+            aflt.DataPoints = IO.Read(file: "C:\\Users\\angry\\Desktop\\AFLT_170101_220101.txt");
+            AfltPlot.Model = BuildDateModel("AFLT", "", aflt.DataPoints);
+
+            Data sber = new(1263);
+            sber.DataPoints = IO.Read(file: "C:\\Users\\angry\\Desktop\\SBER_170101_220101.txt");
+            SberPlot.Model = BuildDateModel("SBER", "", sber.DataPoints);
+
+            Data data = new Data(1000);
+            data.DataPoints = IO.Read();
+            SomePlot.Model = BuildModel("","",data.DataPoints);
         }
 
         ComboBox comboBox = new ComboBox

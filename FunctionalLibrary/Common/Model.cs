@@ -4,6 +4,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using static System.Math;
+using OxyPlot.Axes;
 
 namespace XDPM_App.ADMP
 {
@@ -20,13 +21,27 @@ namespace XDPM_App.ADMP
         /// <param name="showMarker">Set true if you need mark points on series</param>
         /// <overloads>Build a plot from series</overloads>
         /// <returns></returns>
-        public static PlotModel BuildModel(string plotName, string seriesName, List<DataPoint> dataPoints, bool showMarker = false, MarkerType markerType = MarkerType.Circle)
+        public static PlotModel BuildModel(string plotName, string seriesName, List<DataPoint> dataPoints, MarkerType markerType = MarkerType.None)
         {
             PlotModel plotModel = new() { Title = plotName };
             var series = new LineSeries
             {
                 Title = seriesName,
-                MarkerType = showMarker ? markerType : MarkerType.None
+                MarkerType = markerType
+            };
+            series.Points.AddRange(dataPoints);
+            plotModel.Series.Add(series);
+            return plotModel;
+        }
+
+        public static PlotModel BuildDateModel(string plotName, string seriesName, List<DataPoint> dataPoints, MarkerType markerType = MarkerType.None)
+        {
+            PlotModel plotModel = new() { Title = plotName };
+            plotModel.Axes.Add(new DateTimeAxis { Position = AxisPosition.Bottom/*, Minimum = minValue, Maximum = maxValue*/, StringFormat = "dd-MM-yyyy" });
+            var series = new FunctionSeries
+            {
+                Title = seriesName,
+                MarkerType = markerType
             };
             series.Points.AddRange(dataPoints);
             plotModel.Series.Add(series);
@@ -48,12 +63,12 @@ namespace XDPM_App.ADMP
         /// <param name="seriesName"></param>
         /// <param name="showMarker">Set true if you need mark points on series</param>
         /// <returns></returns>
-        public static LineSeries ConvertToLineSeries(List<DataPoint> dataPoints, string seriesName, bool showMarker = false, MarkerType markerType = MarkerType.Circle)
+        public static LineSeries ConvertToLineSeries(List<DataPoint> dataPoints, string seriesName, MarkerType markerType = MarkerType.None)
         {
             var series = new LineSeries
             {
                 Title = seriesName,
-                MarkerType = showMarker ? markerType : MarkerType.None
+                MarkerType = markerType
             };
             series.Points.AddRange(dataPoints);
             return series;
