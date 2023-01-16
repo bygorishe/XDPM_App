@@ -70,7 +70,7 @@ namespace XDPM_App.ADMP
         /// <param name="dataPoints"></param>
         public static void AntiTrendNonLinear(int W, ref List<DataPoint> dataPoints)
         {
-            List<DataPoint> tempDataPoints = new(dataPoints.Count);
+            List<DataPoint> tempDataPoints = DataPointOperations.Copy(dataPoints);
             MovingAverage(W, ref tempDataPoints);
             for (int i = 0; i < dataPoints.Count; i++)
                 dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y - tempDataPoints[i].Y);

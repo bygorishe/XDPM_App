@@ -40,10 +40,10 @@ namespace FunctionalLibrary.Common
                     break;
                 case ".txt":
                     {
-                        //if(isDate)
-                        ReadDateTxtFile(data, path);
-                        //else
-                        //    return ReadTxtFile(path, delta_t);
+                        if (isDate)
+                            ReadDateTxtFile(data, path);
+                        else
+                            ReadTxtFile(data, path, delta_t);
                         break;
                     }
                 default:
@@ -71,25 +71,34 @@ namespace FunctionalLibrary.Common
             data.N = i;
         }
 
+        private static void ReadTxtFile(Data data, string path, double delta_t)
+        {
+            data.DataPoints = new();
+            using StreamReader streamReader = new(File.Open(path, FileMode.Open));
+            string? inString;
+            int i = 0;
+            while (!string.IsNullOrEmpty(inString = streamReader.ReadLine()))
+                data.DataPoints.Add(new DataPoint(i++ * delta_t, Convert.ToDouble(inString)));
+            data.N = i;
+        }
+
         private static void ReadDateTxtFile(Data data, string path)
         {
             data.DataPoints = new();
-            using (StreamReader streamReader = new(File.Open(path, FileMode.Open)))
+            using StreamReader streamReader = new(File.Open(path, FileMode.Open));
+            string? inString;
+            int i = 0;
+            while (!string.IsNullOrEmpty(inString = streamReader.ReadLine()))
             {
-                string? inString;
-                int i = 0;
-                while (!string.IsNullOrEmpty(inString = streamReader.ReadLine()))
-                {
-                    string[] str = inString.Split("\t");
-                    double value = Convert.ToDouble(str[2].Replace('.', ','));
-                    var time = DateTime.Parse(str[0]);
-                    //var day = new DateTime(int.Parse(date[2]), int.Parse(date[1]), int.Parse(date[0])); ;
-                    double timeToDouble = DateTimeAxis.ToDouble(time);
-                    data.DataPoints.Add(new DataPoint(timeToDouble, value));
-                    i++;
-                }
-                data.N = i;
+                string[] str = inString.Split("\t");
+                double value = Convert.ToDouble(str[2].Replace('.', ','));
+                var time = DateTime.Parse(str[0]);
+                //var day = new DateTime(int.Parse(date[2]), int.Parse(date[1]), int.Parse(date[0])); ;
+                double timeToDouble = DateTimeAxis.ToDouble(time);
+                data.DataPoints.Add(new DataPoint(timeToDouble, value));
+                i++;
             }
+            data.N = i;
         }
 
         // боже храни тебя господьб найдено и честно позаимствованое
@@ -126,7 +135,7 @@ namespace FunctionalLibrary.Common
                 throw new Exception("Not wav Data");
         }
 
-        public static void Write(List<DataPoint> list)
+        public static void Write(List<DataPoint> list, bool isDoubleAccuracy = false)
         {
             SaveFileDialog dialog = new();
             dialog.Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat"; /* | All files(*.*) | *.*| Bin file(*.bin) | *.bin*/
@@ -137,7 +146,7 @@ namespace FunctionalLibrary.Common
             switch (fileExt)
             {
                 case ".dat":
-                    WriteBinFile(list, path);
+                    WriteBinFile(list, path, isDoubleAccuracy);
                     break;
                 case ".txt":
                     WriteTxtFile(list, path);
@@ -148,31 +157,30 @@ namespace FunctionalLibrary.Common
             }
         }
 
-        private static void WriteBinFile(List<DataPoint> list, string path)
+        private static void WriteBinFile(List<DataPoint> list, string path, bool isDoubleAccuracy)
         {
-            using (BinaryWriter binaryWriter = new(File.Open(path, FileMode.OpenOrCreate)))
-            {
-                try
-                {
-                    for (int i = 0; i < list.Count; i++)
-                        binaryWriter.Write(list[i].Y);
-                }
-                finally { }
-            }
+            using BinaryWriter binaryWriter = new(File.Open(path, FileMode.OpenOrCreate));
+            if (isDoubleAccuracy)
+                for (int i = 0; i < list.Count; i++)
+                    binaryWriter.Write(list[i].Y);
+            else
+                for (int i = 0; i < list.Count; i++)
+                    binaryWriter.Write(Convert.ToSingle(list[i].Y));
         }
 
         private static void WriteTxtFile(List<DataPoint> list, string path)
         {
-            using (StreamWriter streamWriter = new(File.Open(path, FileMode.OpenOrCreate)))
-            {
-                try
-                {
-                    for (int i = 0; i < list.Count; i++)
-                        streamWriter.Write(list[i].Y);
-                }
-                finally { }
-            }
+            using StreamWriter streamWriter = new(File.Open(path, FileMode.OpenOrCreate));
+            for (int i = 0; i < list.Count; i++)
+                streamWriter.WriteLine(list[i].Y);
         }
+
+        //private static void WriteDateTxtFile(List<DataPoint> list, string path)
+        //{
+        //    using StreamWriter streamWriter = new(File.Open(path, FileMode.OpenOrCreate));
+        //    for (int i = 0; i < list.Count; i++)
+        //        streamWriter.WriteLine(list[i].Y);
+        //}
     }
 }
 

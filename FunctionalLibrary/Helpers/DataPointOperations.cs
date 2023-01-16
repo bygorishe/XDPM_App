@@ -1,6 +1,8 @@
 ﻿using OxyPlot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace XDPM_App.Common
 {
@@ -113,11 +115,37 @@ namespace XDPM_App.Common
             return newDataPoints;
         }
 
-        public static List<DataPoint> RangeOf(List<DataPoint> dataPoints, int index, int count)
+        public static List<DataPoint> TakeRangeOf(List<DataPoint> dataPoints, int index, int count)
         {
             DataPoint[] newDataPoints = new DataPoint[count];
             dataPoints.CopyTo(index, newDataPoints, 0, count);
             return newDataPoints.ToList();
+        }
+
+        public static List<DataPoint> TakeRangeOfAndNullOther(List<DataPoint> dataPoints, int index, int count)
+        {
+            int size = dataPoints.Count;
+            DataPoint[] newDataPoints = new DataPoint[size];
+            dataPoints.CopyTo(index, newDataPoints, index, count);
+            return newDataPoints.ToList();
+        }
+
+        public static List<DataPoint> Copy(List<DataPoint> dataPoints)
+        {
+            int size = dataPoints.Count;
+            DataPoint[] newDataPoints = new DataPoint[size];
+            dataPoints.CopyTo(0, newDataPoints, 0, size);
+            return newDataPoints.ToList();
+        }
+
+        public static List<DataPoint> Join(params List<DataPoint>[] dataPoints)
+        {
+            List<DataPoint> newDataPoints = new();
+            foreach(var points in dataPoints)
+            {
+                newDataPoints.AddRange(newDataPoints);
+            }
+            return newDataPoints;
         }
     }
 }

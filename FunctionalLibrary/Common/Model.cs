@@ -57,14 +57,10 @@ namespace XDPM_App.ADMP
             double step = (max - min) / barCount;
             List<double> ranges = new(barCount + 1);
             List<HistogramItem> bars = new(barCount + 1);
-            List<int> count = new(barCount);
+            int[] count = new int[barCount];
             PlotModel plotModel = new() { Title = plotName };
-            for (int i = 0; i < barCount; i++)
-            {
+            for (int i = 0; i <= barCount; i++)
                 ranges.Add(min + step * i);
-                count.Add(0);
-            }
-            ranges.Add(min + step * barCount);
             foreach (var value in valueList)
                 for (int i = 0; i < barCount; i++)
                     if (ranges[i] <= value && value <= ranges[i + 1])
@@ -125,18 +121,54 @@ namespace XDPM_App.ADMP
             return dataPoints;
         }
 
-        private static DataPoint ExpTrendPoint(double t, double a, double b)
-            => new(t, b * Exp(-a * t));
+        public static List<DataPoint> SimpleGBM(int N, double c, double Mm, double Betta, double delta_t = _deltaT)
+        {
+            List<DataPoint> dataPoints = new(N);
+            List < DataPoint > temp = RandomNoiseTrend(N, c, delta_t, false);
+            //Analysis analysis = new(temp, N, 10);
+            double M = Mm;
+            double betta = Betta;
+            for (int i = 0; i < N; i++)
+                dataPoints.Add(ExpTrendPoint(i, c, (M - (betta * betta) / 2) * i + betta * temp[i].Y )); 
+            return dataPoints;
+        }
 
-        public static List<DataPoint> RandomNoiseTrend(int N, double R, double delta_t = _deltaT)
+        public static List<DataPoint> GBM(int N, double c, double delta_t = _deltaT)
+        {
+            List<DataPoint> dataPoints = new(N);
+            List<DataPoint> temp = RandomNoiseTrend(N, c, delta_t, false);
+            Analysis analysis = new(temp, N, 10);
+            double M = analysis.M;
+            double betta = analysis.Betta;
+            for (int i = 0; i < N; i++)
+                dataPoints.Add(ExpTrendPoint(i, c, (M - (betta * betta) / 2) * i * delta_t + betta * temp[i].Y));
+            return dataPoints;
+        }
+
+        private static DataPoint ExpTrendPoint(double t, double a, double b)
+            => new(t, a * Exp(b));
+
+        public static List<DataPoint> RandomNoiseTrend(int N, double R, double delta_t = _deltaT, bool canBeNegative = true)
         {
             List<DataPoint> dataPoints = new(N);
             Random random = new();
-            for (int i = 0; i < N; i++)
+            if (canBeNegative)
             {
-                double value = random.Next();
-                value = (value / int.MaxValue - 0.5) * 2 * R;
-                dataPoints.Add(new DataPoint(i * delta_t, value));
+                for (int i = 0; i < N; i++)
+                {
+                    double value = random.Next();
+                    value = (value / int.MaxValue - 0.5) * 2 * R;
+                    dataPoints.Add(new DataPoint(i * delta_t, value));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < N; i++)
+                {
+                    double value = random.Next();
+                    value = value / int.MaxValue * R;
+                    dataPoints.Add(new DataPoint(i * delta_t, value));
+                }
             }
             return dataPoints;
         }
