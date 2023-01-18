@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using static System.Math;
 using OxyPlot.Axes;
 using System.Linq;
+using MathNet.Numerics.Distributions;
 
 namespace XDPM_App.ADMP
 {
@@ -121,28 +122,50 @@ namespace XDPM_App.ADMP
             return dataPoints;
         }
 
-        public static List<DataPoint> SimpleGBM(int N, double c, double Mm, double Betta, double delta_t = _deltaT)
-        {
-            List<DataPoint> dataPoints = new(N);
-            List < DataPoint > temp = RandomNoiseTrend(N, c, delta_t, false);
-            //Analysis analysis = new(temp, N, 10);
-            double M = Mm;
-            double betta = Betta;
-            for (int i = 0; i < N; i++)
-                dataPoints.Add(ExpTrendPoint(i, c, (M - (betta * betta) / 2) * i + betta * temp[i].Y )); 
-            return dataPoints;
-        }
+        //public static List<DataPoint> SimpleGBM(int N, double c, double delta_t = _deltaT)
+        //{
+        //    List<DataPoint> dataPoints = new(N);
+        //    List<DataPoint> temp = RandomNoiseTrend(N, c, delta_t, false);
+        //    Analysis analysis = new(temp, N, 10);
+        //    double M = analysis.M;
+        //    double betta = analysis.Betta;
+        //    for (int i = 0; i < N; i++)
+        //        dataPoints.Add(ExpTrendPoint(i, c, (M - (betta * betta) / 2) * 1 + betta * temp[i].Y));
+        //    return dataPoints;
+        //}
 
-        public static List<DataPoint> GBM(int N, double c, double delta_t = _deltaT)
+        public static List<DataPoint> GBM(List<DataPoint> dataPoints, int N, int rangeNumber, double delta_t = 1)
         {
-            List<DataPoint> dataPoints = new(N);
-            List<DataPoint> temp = RandomNoiseTrend(N, c, delta_t, false);
-            Analysis analysis = new(temp, N, 10);
-            double M = analysis.M;
-            double betta = analysis.Betta;
-            for (int i = 0; i < N; i++)
-                dataPoints.Add(ExpTrendPoint(i, c, (M - (betta * betta) / 2) * i * delta_t + betta * temp[i].Y));
-            return dataPoints;
+            List<DataPoint> newDataPoints = new(N);
+            List<double> value = DataPointOperations.GetValue(dataPoints);
+            int size = N / rangeNumber;
+            for (int j = 0; j < rangeNumber; j++)
+            {
+                double[] rt = new double[size];
+                for (int i = 1; i < size; i++)
+                    rt[i] = (value[i + j * size] - value[i + j * size - 1]) / value[i + j * size - 1];
+                double mu = rt.Average();
+                double sum = 0;
+                double[] xk = new double[size];
+                for (int i = 0; i < size; i++)
+                {
+                    xk[i] = rt[i] - mu;
+                    sum += xk[i] * xk[i];
+                }
+                double sigma = Sqrt(sum / size);
+                double S0 = value[j * size];
+                double[] W = new double[size];
+                Random random = new();
+                double[] S = new double[size];
+                for (int i = 0; i < size; i++)
+                {
+                    W[i] = Normal.Sample(random, 0.0, 1.0);
+                    S[i] = S0 * Exp(mu - 0.5 * (sigma * sigma) * delta_t + sigma * W[i] * Sqrt(delta_t));
+                    S0 = S[i];
+                    newDataPoints.Add(new DataPoint(i + j * size, S[i]));
+                }
+            }
+            return newDataPoints;
         }
 
         private static DataPoint ExpTrendPoint(double t, double a, double b)

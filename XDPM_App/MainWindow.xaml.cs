@@ -11,6 +11,7 @@ using System.Windows.Media;
 using FunctionalLibrary.Common;
 using OxyPlot.Axes;
 using OxyPlot.Series;
+using System.Linq;
 
 namespace XDPM_App
 {
@@ -33,27 +34,28 @@ namespace XDPM_App
             List<DataPoint> list = new();
             list = DataPointOperations.Copy(yandex.DataPoints);
             //Processing.AntiTrendNonLinear(10, ref yandex.DataPoints);
-            Processing.MovingAverage(10, ref list);
+            Processing.AntiTrendNonLinear(10, ref list);
+            //Processing.MovingAverage(10, ref list);
             YndxPlot.Model = BuildDateModel("YNDX", "", yandex.DataPoints);
-            AfltPlot.Model = BuildDateModel("AFLT", "", list);
-            SberPlot.Model = BuildDateModel("", "", DataPointOperations.SumPoints(list, yandex.DataPoints));
+            //AfltPlot.Model = BuildDateModel("AFLT", "", list);
+            //SberPlot.Model = BuildDateModel("", "", DataPointOperations.SumPoints(list, yandex.DataPoints));
 
 
-            //Data aflt = new();
-            //IO.Read(aflt, file: "C:\\Users\\angry\\Desktop\\AFLT_170101_220101.txt", isDate: true);
+            Data aflt = new();
+            IO.Read(aflt, file: "C:\\Users\\angry\\Desktop\\AFLT_170101_220101.txt", isDate: true);
 
             //Processing.MovingAverage(10, ref aflt.DataPoints);
 
-            //AfltPlot.Model = BuildDateModel("AFLT", "", aflt.DataPoints);
+            AfltPlot.Model = BuildDateModel("AFLT", "", aflt.DataPoints);
 
-            //Data sber = new();
-            //IO.Read(sber, file: "C:\\Users\\angry\\Desktop\\SBER_170101_220101.txt", isDate: true);
+            Data sber = new();
+            IO.Read(sber, file: "C:\\Users\\angry\\Desktop\\SBER_170101_220101.txt", isDate: true);
 
             //Processing.MovingAverage(10, ref sber.DataPoints);
 
-            //SberPlot.Model = BuildDateModel("sber", "", sber.DataPoints);
+            SberPlot.Model = BuildDateModel("sber", "", sber.DataPoints);
 
-            Analysis yandexA = new(yandex.DataPoints, yandex.N, 10);
+            //Analysis yandexA = new(yandex.DataPoints, yandex.N, 10);
             //Analysis afltA = new(aflt.DataPoints, aflt.N, 10);
             //Analysis sberA = new(sber.DataPoints, sber.N, 10);
 
@@ -85,9 +87,22 @@ namespace XDPM_App
             //S_T3.Text = sberA.Sationarity.ToString();
 
             Data data = new();
-            data.DataPoints = SimpleGBM(100, 2000, yandexA.M, yandexA.Betta);
+            data.DataPoints = GBM(aflt.DataPoints, yandex.N, 60);
+            //data.DataPoints = SimpleGBM(yandex.N, 10);
             //Processing.MovingAverage(10, ref aflt.DataPoints);
-            //data.DataPoints = DataPointOperations.SumPoints(list, data.DataPoints);
+            //data.DataPoints = DataPointOperations.SumPoints(1260, list, data.DataPoints);
+
+            Analysis sberA = new(data.DataPoints, 1260, 10);
+            min_T3.Text = sberA.Min.ToString("##.###");
+            max_T3.Text = sberA.Max.ToString("##.###");
+            M_T3.Text = sberA.M.ToString("##.###");
+            D_T3.Text = sberA.D.ToString("##.###");
+            SKO_T3.Text = sberA.Betta.ToString("##.###");
+            As_T3.Text = sberA.Gamma1.ToString("##.###");
+            K_T3.Text = sberA.Gamma2.ToString("##.###");
+            S_T3.Text = sberA.Sationarity.ToString();
+
+            SberPlot.Model = BuildModel("", "", sberA.CCF(aflt.DataPoints.Select(x => x.Y).ToList()));
 
             SomePlot.Model = BuildModel("", "", data.DataPoints);
         }

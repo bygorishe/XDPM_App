@@ -37,9 +37,23 @@ namespace XDPM_App.Common
         /// </summary>
         /// <param name="dataPoints"></param>
         /// <returns></returns>
-        public static List<DataPoint> SumPoints(params List<DataPoint>[] dataPoints)
+        public static List<DataPoint> SumPoints( params List<DataPoint>[] dataPoints)
         {
             int N = dataPoints[0].Count;
+            List<double> y = new(N);
+            List<DataPoint> newDataPoints = new(N);
+            for (int i = 0; i < N; i++)
+                y.Add(0);
+            foreach (var list in dataPoints)
+                for (int i = 0; i < N; i++)
+                    y[i] += list[i].Y;
+            for (int i = 0; i < N; i++)
+                newDataPoints.Add(new DataPoint(dataPoints[0][i].X, y[i]));
+            return newDataPoints;
+        }
+
+        public static List<DataPoint> SumPoints(int N, params List<DataPoint>[] dataPoints)
+        {
             List<double> y = new(N);
             List<DataPoint> newDataPoints = new(N);
             for (int i = 0; i < N; i++)
