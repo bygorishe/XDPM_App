@@ -11,134 +11,66 @@ using System.Windows.Media;
 using FunctionalLibrary.Common;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using System.Linq;
+using System.IO;
+using System.Windows.Shapes;
+using System.Drawing;
+using System.Windows.Media.Imaging;
+using System.Windows.Interop;
+using System.Windows.Ink;
+using System.Windows.Media.Media3D;
 
 namespace XDPM_App
 {
     public partial class MainWindow : Window
     {
-        List<Data> datas = new();
+        Dictionary<string, Data> datas = new();
         HarmParamWindow harmParamWindow = null!;
-
-        bool hideAnalysis = true;
-        const int width = 150;
-        private bool _shouldOpenDropDown;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            Data yandex = new();
-            IO.Read(yandex, file: "C:\\Users\\angry\\Desktop\\YNDX_170101_220101.txt", isDate: true);
-
-            List<DataPoint> list = new();
-            list = DataPointOperations.Copy(yandex.DataPoints);
-            //Processing.AntiTrendNonLinear(10, ref yandex.DataPoints);
-            Processing.AntiTrendNonLinear(10, ref list);
-            //Processing.MovingAverage(10, ref list);
-            YndxPlot.Model = BuildDateModel("YNDX", "", yandex.DataPoints);
-            //AfltPlot.Model = BuildDateModel("AFLT", "", list);
-            //SberPlot.Model = BuildDateModel("", "", DataPointOperations.SumPoints(list, yandex.DataPoints));
-
-
-            Data aflt = new();
-            IO.Read(aflt, file: "C:\\Users\\angry\\Desktop\\AFLT_170101_220101.txt", isDate: true);
-
-            //Processing.MovingAverage(10, ref aflt.DataPoints);
-
-            AfltPlot.Model = BuildDateModel("AFLT", "", aflt.DataPoints);
-
-            Data sber = new();
-            IO.Read(sber, file: "C:\\Users\\angry\\Desktop\\SBER_170101_220101.txt", isDate: true);
-
-            //Processing.MovingAverage(10, ref sber.DataPoints);
-
-            SberPlot.Model = BuildDateModel("sber", "", sber.DataPoints);
-
-            //Analysis yandexA = new(yandex.DataPoints, yandex.N, 10);
-            //Analysis afltA = new(aflt.DataPoints, aflt.N, 10);
-            //Analysis sberA = new(sber.DataPoints, sber.N, 10);
-
-            //min_T2.Text = afltA.Min.ToString("##.###");
-            //max_T2.Text = afltA.Max.ToString("##.###");
-            //M_T2.Text = afltA.M.ToString("##.###");
-            //D_T2.Text = afltA.D.ToString("##.###");
-            //SKO_T2.Text = afltA.Betta.ToString("##.###");
-            //As_T2.Text = afltA.Gamma1.ToString("##.###");
-            //K_T2.Text = afltA.Gamma2.ToString("##.###");
-            //S_T2.Text = afltA.Sationarity.ToString();
-
-            //min_T1.Text = yandexA.Min.ToString("##.###");
-            //max_T1.Text = yandexA.Max.ToString("##.###");
-            //M_T1.Text = yandexA.M.ToString("##.###");
-            //D_T1.Text = yandexA.D.ToString("##.###");
-            //SKO_T1.Text = yandexA.Betta.ToString("##.###");
-            //As_T1.Text = yandexA.Gamma1.ToString("##.###");
-            //K_T1.Text = yandexA.Gamma2.ToString("##.###");
-            //S_T1.Text = yandexA.Sationarity.ToString();
-
-            //min_T3.Text = sberA.Min.ToString("##.###");
-            //max_T3.Text = sberA.Max.ToString("##.###");
-            //M_T3.Text = sberA.M.ToString("##.###");
-            //D_T3.Text = sberA.D.ToString("##.###");
-            //SKO_T3.Text = sberA.Betta.ToString("##.###");
-            //As_T3.Text = sberA.Gamma1.ToString("##.###");
-            //K_T3.Text = sberA.Gamma2.ToString("##.###");
-            //S_T3.Text = sberA.Sationarity.ToString();
-
-            Data data = new();
-            data.DataPoints = GBM(aflt.DataPoints, yandex.N, 60);
-            //data.DataPoints = SimpleGBM(yandex.N, 10);
-            //Processing.MovingAverage(10, ref aflt.DataPoints);
-            //data.DataPoints = DataPointOperations.SumPoints(1260, list, data.DataPoints);
-
-            Analysis sberA = new(data.DataPoints, 1260, 10);
-            min_T3.Text = sberA.Min.ToString("##.###");
-            max_T3.Text = sberA.Max.ToString("##.###");
-            M_T3.Text = sberA.M.ToString("##.###");
-            D_T3.Text = sberA.D.ToString("##.###");
-            SKO_T3.Text = sberA.Betta.ToString("##.###");
-            As_T3.Text = sberA.Gamma1.ToString("##.###");
-            K_T3.Text = sberA.Gamma2.ToString("##.###");
-            S_T3.Text = sberA.Sationarity.ToString();
-
-            SberPlot.Model = BuildModel("", "", sberA.CCF(aflt.DataPoints.Select(x => x.Y).ToList()));
-
-            SomePlot.Model = BuildModel("", "", data.DataPoints);
+            BmpData data = new("C:/Users/angry/Desktop/grace.jpg");
+            Image1.Source = data.Image;
+            ImageProccesing.Shift(data, 30);
+            data.Save("C:/Users/angry/Desktop/grace1.jpg");
+            Image2.Source = data.Image;
+            ImageProccesing.Mult(data, 1.3);
+            data.Save("C:/Users/angry/Desktop/grace2.jpg");
+            Image3.Source = data.Image;
         }
 
-        ComboBox comboBox = new ComboBox
-        {
-            ItemsSource = typeof(Colors).GetProperties(),
-        };
+        //ComboBox comboBox = new ComboBox
+        //{
+        //    ItemsSource = typeof(Colors).GetProperties(),
+        //};
 
-        private void CreateTabItem(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.Items.Add(new TabItem
-            {
-                Header = new TextBlock { Text = "s" },
-                Name = "Name",
-                Focusable = true,
-            });
-        }
+        //private void CreateTabItem(object sender, RoutedEventArgs e)
+        //{
+        //    MainTabControl.Items.Add(new TabItem
+        //    {
+        //        Header = new TextBlock { Text = "s" },
+        //        Name = "Name",
+        //        Focusable = true,
+        //    });
+        //}
 
-        private void ComboBox_DropDownOpened(object sender, EventArgs e)
-        {
-            if (comboBox.IsDropDownOpen)
-            {
-                _shouldOpenDropDown = false;
-            }
-            else
-            {
-                comboBox.IsDropDownOpen = false;
-            }
-        }
+        //private void ComboBox_DropDownOpened(object sender, EventArgs e)
+        //{
+        //    if (comboBox.IsDropDownOpen)
+        //    {
+        //        _shouldOpenDropDown = false;
+        //    }
+        //    else
+        //    {
+        //        comboBox.IsDropDownOpen = false;
+        //    }
+        //}
 
-        private void ComboBox_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            _shouldOpenDropDown = true;
-            comboBox.IsDropDownOpen = true;
-        }
+        //private void ComboBox_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    _shouldOpenDropDown = true;
+        //    comboBox.IsDropDownOpen = true;
+        //}
 
         private void TextBox_paramN_TextChanged(object sender, TextChangedEventArgs e)
         {

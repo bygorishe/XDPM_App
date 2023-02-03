@@ -7,6 +7,7 @@ using static System.Math;
 using OxyPlot.Axes;
 using System.Linq;
 using MathNet.Numerics.Distributions;
+using FunctionalLibrary.Helpers.Parametrs;
 
 namespace XDPM_App.ADMP
 {
@@ -23,34 +24,38 @@ namespace XDPM_App.ADMP
         /// <param name="showMarker">Set true if you need mark points on series</param>
         /// <overloads>Build a plot from series</overloads>
         /// <returns></returns>
-        public static PlotModel BuildModel(string plotName, string seriesName, List<DataPoint> dataPoints, MarkerType markerType = MarkerType.None)
+        public static PlotModel BuildModel(string plotName, string seriesName, List<DataPoint> dataPoints,
+            MarkerType markerType = MarkerType.None, OxyColor? seriesColor = null)
         {
             PlotModel plotModel = new() { Title = plotName };
             var series = new LineSeries
             {
                 Title = seriesName,
-                MarkerType = markerType
+                MarkerType = markerType,
+                Color = seriesColor != null ? (OxyColor)seriesColor : OxyColors.Automatic,
             };
             series.Points.AddRange(dataPoints);
             plotModel.Series.Add(series);
             return plotModel;
         }
 
-        public static PlotModel BuildDateModel(string plotName, string seriesName, List<DataPoint> dataPoints, MarkerType markerType = MarkerType.None)
+        public static PlotModel BuildDateModel(string plotName, string seriesName, List<DataPoint> dataPoints,
+            MarkerType markerType = MarkerType.None, OxyColor? seriesColor = null)
         {
             PlotModel plotModel = new() { Title = plotName };
-            plotModel.Axes.Add(new DateTimeAxis { Position = AxisPosition.Bottom/*, Minimum = minValue, Maximum = maxValue*/, StringFormat = "dd-MM-yyyy" });
+            plotModel.Axes.Add(new DateTimeAxis { Position = AxisPosition.Bottom, StringFormat = "dd-MM-yyyy" });
             var series = new FunctionSeries
             {
                 Title = seriesName,
-                MarkerType = markerType
+                MarkerType = markerType,
+                Color = seriesColor != null ? (OxyColor)seriesColor : OxyColors.Automatic,
             };
             series.Points.AddRange(dataPoints);
             plotModel.Series.Add(series);
             return plotModel;
         }
 
-        public static PlotModel BuildHistModel(string plotName, string seriesName, List<DataPoint> dataPoints, int barCount = 10, MarkerType markerType = MarkerType.None)
+        public static PlotModel BuildHistModel(string plotName, List<DataPoint> dataPoints, int barCount = 10, OxyColor? seriesColor = null)
         {
             var valueList = DataPointOperations.GetValue(dataPoints);
             double min = valueList.Min();
@@ -71,7 +76,11 @@ namespace XDPM_App.ADMP
                     }
             for (int i = 0; i < barCount; i++)
                 bars.Add(new HistogramItem(ranges[i], ranges[i + 1], count[i] * (ranges[i + 1] - ranges[i]), count[i]));
-            HistogramSeries series = new() { StrokeThickness = 1 };
+            HistogramSeries series = new() 
+            {
+                StrokeThickness = 1,
+                FillColor = seriesColor != null ? (OxyColor)seriesColor : OxyColors.Automatic,
+            };
             series.Items.AddRange(bars);
             plotModel.Series.Add(series);
             return plotModel;
@@ -92,12 +101,14 @@ namespace XDPM_App.ADMP
         /// <param name="seriesName"></param>
         /// <param name="showMarker">Set true if you need mark points on series</param>
         /// <returns></returns>
-        public static LineSeries ConvertToLineSeries(List<DataPoint> dataPoints, string seriesName, MarkerType markerType = MarkerType.None)
+        public static LineSeries ConvertToLineSeries(List<DataPoint> dataPoints, string seriesName,
+            MarkerType markerType = MarkerType.None, OxyColor? seriesColor = null)
         {
             var series = new LineSeries
             {
                 Title = seriesName,
-                MarkerType = markerType
+                MarkerType = markerType,
+                Color = seriesColor != null ? (OxyColor)seriesColor : OxyColors.Automatic,
             };
             series.Points.AddRange(dataPoints);
             return series;
@@ -121,18 +132,6 @@ namespace XDPM_App.ADMP
                 dataPoints.Add(ExpTrendPoint(i * delta_t, a, b));
             return dataPoints;
         }
-
-        //public static List<DataPoint> SimpleGBM(int N, double c, double delta_t = _deltaT)
-        //{
-        //    List<DataPoint> dataPoints = new(N);
-        //    List<DataPoint> temp = RandomNoiseTrend(N, c, delta_t, false);
-        //    Analysis analysis = new(temp, N, 10);
-        //    double M = analysis.M;
-        //    double betta = analysis.Betta;
-        //    for (int i = 0; i < N; i++)
-        //        dataPoints.Add(ExpTrendPoint(i, c, (M - (betta * betta) / 2) * 1 + betta * temp[i].Y));
-        //    return dataPoints;
-        //}
 
         public static List<DataPoint> GBM(List<DataPoint> dataPoints, int N, int rangeNumber, double delta_t = 1)
         {
@@ -176,23 +175,19 @@ namespace XDPM_App.ADMP
             List<DataPoint> dataPoints = new(N);
             Random random = new();
             if (canBeNegative)
-            {
                 for (int i = 0; i < N; i++)
                 {
                     double value = random.Next();
                     value = (value / int.MaxValue - 0.5) * 2 * R;
                     dataPoints.Add(new DataPoint(i * delta_t, value));
                 }
-            }
             else
-            {
                 for (int i = 0; i < N; i++)
                 {
                     double value = random.Next();
                     value = value / int.MaxValue * R;
                     dataPoints.Add(new DataPoint(i * delta_t, value));
                 }
-            }
             return dataPoints;
         }
 
@@ -265,13 +260,13 @@ namespace XDPM_App.ADMP
             return dataPoints;
         }
 
-        public static List<DataPoint> PolyHarmTrend(int N, List<HarmParam> harmParams, double delta_t = _deltaT)
+        public static List<DataPoint> PolyHarmTrend(int N, List<HarmParams> harmParams, double delta_t = _deltaT)
         {
             List<DataPoint> dataPoints = new(N);
             double[] value = new double[N];
             foreach (var parametrs in harmParams)
                 for (int i = 0; i < N; i++)
-                    value[i] += HarmFuncValue(i, parametrs.A, parametrs.f, delta_t);
+                    value[i] += HarmFuncValue(i, parametrs.A, parametrs.F, delta_t);
 
             for (int i = 0; i < N; i++)
                 dataPoints.Add(new DataPoint(i * delta_t, value[i]));

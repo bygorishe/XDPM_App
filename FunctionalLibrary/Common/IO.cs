@@ -3,8 +3,10 @@ using OxyPlot;
 using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using XDPM_App.ADMP;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
@@ -133,6 +135,19 @@ namespace FunctionalLibrary.Common
             }
             else
                 throw new Exception("Not wav Data");
+        }
+
+        public static Bitmap ReadJpgFile()
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Title = "Open Image";
+            dlg.Filter = "jpg files (*.jpg)|*.jpg|All files (*.*)|*.*";
+
+            if (dlg.ShowDialog() == true)
+            {
+                return new Bitmap(dlg.OpenFile());
+            }
+            return null;
         }
 
         public static void Write(List<DataPoint> list, bool isDoubleAccuracy = false)

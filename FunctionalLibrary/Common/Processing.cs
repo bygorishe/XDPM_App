@@ -2,6 +2,7 @@
 using OxyPlot;
 using System.Collections.Generic;
 using static System.Math;
+using System.Windows.Media.Imaging;
 
 namespace XDPM_App.ADMP
 {
@@ -22,23 +23,23 @@ namespace XDPM_App.ADMP
         /// </summary>
         /// <param name="R"></param>
         /// <param name="dataPoints"></param>
-        public static void AntiSpike(double R, ref List<DataPoint> dataPoints)
-        {
-            for (int i = 0; i < dataPoints.Count; i++)
-            {
-                if (Abs(dataPoints[i].Y) > R && i != 0 && i != dataPoints.Count - 1)
-                {
-                    double value = (dataPoints[i - 1].Y + dataPoints[i + 1].Y) / 2;
-                    dataPoints[i] = new DataPoint(dataPoints[i].X, value);
-                }
-                else if (i == 0)
-                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i + 1].Y / 2);
-                else if (i == dataPoints.Count - 1)
-                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i - 1].Y / 2);
-                else
-                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y);
-            }
-        }
+        //public static void AntiSpike(double R, ref List<DataPoint> dataPoints)
+        //{
+        //    for (int i = 0; i < dataPoints.Count; i++)
+        //    {
+        //        if (Abs(dataPoints[i].Y) > R && i != 0 && i != dataPoints.Count - 1)
+        //        {
+        //            double value = (dataPoints[i - 1].Y + dataPoints[i + 1].Y) / 2;
+        //            dataPoints[i] = new DataPoint(dataPoints[i].X, value);
+        //        }
+        //        else if (i == 0)
+        //            dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i + 1].Y / 2);
+        //        else if (i == dataPoints.Count - 1)
+        //            dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i - 1].Y / 2);
+        //        else
+        //            dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y);
+        //    }
+        //}
 
         /// <summary>
         /// Delete linear trend from general trend
@@ -52,13 +53,14 @@ namespace XDPM_App.ADMP
 
         public static void MovingAverage(int W, ref List<DataPoint> dataPoints)
         {
-            for (int i = 0; i < dataPoints.Count / W; i++)
+            int step =dataPoints.Count / W;
+            for (int i = 0; i < W; i++)
             {
                 double average = 0;
-                for (int j = i * W; j < (i + 1) * W; j++)
+                for (int j = i * step; j < (i + 1) * step; j++)
                     average += dataPoints[j].Y;
-                average /= W;
-                for (int j = i * W; j < (i + 1) * W; j++)
+                average /= step;
+                for (int j = i * step; j < (i + 1) * step; j++)
                     dataPoints[j] = new DataPoint(dataPoints[j].X, average);
             }
         }
@@ -155,6 +157,31 @@ namespace XDPM_App.ADMP
             LowPassFilter(fc2, delta_t, m, ref lpw2);
             for (int k = 0; k <= 2 * m; k++)
                 bsw.Add(k == m ? 1 + lpw1[k] - lpw2[k] : lpw1[k] - lpw2[k]);
+        }
+    }
+
+    public static class ImageProccesing
+    {
+        public static void Shift(BmpData data, byte shiftValue)
+        {
+            for (int i = 0; i < data.bytes.Length; i++)
+            {
+                data.bytes[i++] += shiftValue;
+                data.bytes[i++] += shiftValue;
+                data.bytes[i++] += shiftValue;
+            }
+            data.ChangeBytesInImage();
+        }
+
+        public static void Mult(BmpData data, double multValue)
+        {
+            for (int i = 0; i < data.bytes.Length; i++)
+            {
+                data.bytes[i] = (byte)(data.bytes[i++] * multValue);
+                data.bytes[i] = (byte)(data.bytes[i++] * multValue);
+                data.bytes[i] = (byte)(data.bytes[i++] * multValue);
+            }
+            data.ChangeBytesInImage();
         }
     }
 }

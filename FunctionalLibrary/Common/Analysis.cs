@@ -11,8 +11,8 @@ namespace XDPM_App.ADMP
     {
         private const double _deltaT = 0.001;
         private readonly int _N, _analysisSpan;
-        public double Min, Max, M, D, Betta, Sigma, Eps, Gamma1, Gamma2;
-        public bool Sationarity;
+        public double Min, Max, M, D, Sigma, MSE, Eps, Gamma1, Gamma2;
+        public bool Stationarity;
         private readonly List<double> _valueList;
         private List<double> _xk = null!;
         private List<double> _averageValue = null!;
@@ -31,12 +31,12 @@ namespace XDPM_App.ADMP
             Max = _valueList.Max();
             this.M = ExpectedValue();
             D = Variation();
-            Betta = Sqrt(D);
-            Sigma = SigmaValue();
-            Eps = Sqrt(Sigma);
-            Gamma1 = Assimetry() / Pow(Betta, 3);
-            Gamma2 = Kurtosis() / Pow(Betta, 4) - 3;
-            Sationarity = Stationarity();
+            Sigma = Sqrt(D);
+            MSE = MSE_Value();
+            Eps = Sqrt(MSE);
+            Gamma1 = Assimetry() / Pow(Sigma, 3);
+            Gamma2 = Kurtosis() / Pow(Sigma, 4) - 3;
+            Stationarity = IsStationarity();
         }
 
         private double ExpectedValue() => _valueList.Average();
@@ -52,7 +52,7 @@ namespace XDPM_App.ADMP
             return sum / _N;
         }
 
-        private double SigmaValue()
+        private double MSE_Value()
         {
             double sum = 0;
             for (int i = 0; i < _N; i++)
@@ -76,7 +76,7 @@ namespace XDPM_App.ADMP
             return sum / _N;
         }
 
-        private bool Stationarity()
+        private bool IsStationarity()
         {
             int step = _N / _analysisSpan;
             _averageValue = new List<double>(_analysisSpan);

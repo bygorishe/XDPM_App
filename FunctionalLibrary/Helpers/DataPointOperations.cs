@@ -1,8 +1,6 @@
 ﻿using OxyPlot;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace XDPM_App.Common
 {
@@ -65,7 +63,6 @@ namespace XDPM_App.Common
                 newDataPoints.Add(new DataPoint(dataPoints[0][i].X, y[i]));
             return newDataPoints;
         }
-
 
         /// <summary>
         /// Multiply all datapoints
@@ -156,9 +153,7 @@ namespace XDPM_App.Common
         {
             List<DataPoint> newDataPoints = new();
             foreach(var points in dataPoints)
-            {
                 newDataPoints.AddRange(newDataPoints);
-            }
             return newDataPoints;
         }
     }

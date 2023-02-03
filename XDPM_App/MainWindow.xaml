@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1200">
+        Title="MainWindow" Height="400" Width="1500">
     <Grid Background="#CBC7F9">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="9*"/>
@@ -14,12 +14,20 @@
         <TabControl x:Name="MainTabControl" Grid.Column="0">
             <TabItem>
                 <TabItem.Header>
-                    Trend
+                    a
                 </TabItem.Header>
                 <TabItem.Content>
                     <Border BorderThickness="3" BorderBrush="Black">
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Image x:Name="Image1" Grid.Column="0"/>
+                            <Image x:Name="Image2" Grid.Column="1"/>
+                            <Image x:Name="Image3" Grid.Column="2"/>
+                            <!--<Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition/>
@@ -196,7 +204,7 @@
                                         <TextBlock x:Name="S_T4" HorizontalAlignment="Right"/>
                                     </DockPanel>
                                 </StackPanel>
-                            </Grid>
+                            </Grid>-->
                         </Grid>
                     </Border>
                 </TabItem.Content>
@@ -861,7 +869,7 @@
 
         <ScrollViewer Grid.Column="1" MinWidth="110" VerticalScrollBarVisibility="Auto">
             <StackPanel Background="LightCyan" x:Name="ParamPanel" >
-                <DockPanel>
+                <!--<DockPanel>
                     <TextBlock Text="N" FontSize="16" Width="20"/>
                     <TextBox x:Name="TextBox_paramN" TextChanged="TextBox_paramN_TextChanged"/>
                 </DockPanel>
@@ -869,7 +877,7 @@
 
                 <Separator Height="10" Background="Black"/>
 
-                <Button Content="New s" x:Name = "CreateTabItemButton" Click="CreateTabItem"/>
+                <Button Content="New s" x:Name = "CreateTabItemButton" Click="CreateTabItem"/>-->
 
                 <!--<TextBlock Text="Тренды" HorizontalAlignment="Center"/>
                 <DockPanel>
