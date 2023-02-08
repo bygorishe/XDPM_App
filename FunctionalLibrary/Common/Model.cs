@@ -244,11 +244,6 @@ namespace XDPM_App.ADMP
             return dataPoints;
         }
 
-        public static void Shift(double S, ref List<DataPoint> dataPoints)
-        {
-            DataPointOperations.SumPointsWithNumber(ref dataPoints, S);
-        }
-
         private static double HarmFuncValue(int i, double A, double f, double delta_t = _deltaT)
             => A * Sin(2 * PI * f * i * delta_t);
 

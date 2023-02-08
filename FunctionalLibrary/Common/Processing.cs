@@ -8,6 +8,10 @@ namespace XDPM_App.ADMP
 {
     public static class Processing
     {
+        public static void Shift(ref List<DataPoint> dataPoints, double S)
+        {
+            DataPointOperations.SumPointsWithNumber(ref dataPoints, S);
+        }
         /// <summary>
         /// Correct datapoints on number
         /// </summary>
@@ -23,23 +27,23 @@ namespace XDPM_App.ADMP
         /// </summary>
         /// <param name="R"></param>
         /// <param name="dataPoints"></param>
-        //public static void AntiSpike(double R, ref List<DataPoint> dataPoints)
-        //{
-        //    for (int i = 0; i < dataPoints.Count; i++)
-        //    {
-        //        if (Abs(dataPoints[i].Y) > R && i != 0 && i != dataPoints.Count - 1)
-        //        {
-        //            double value = (dataPoints[i - 1].Y + dataPoints[i + 1].Y) / 2;
-        //            dataPoints[i] = new DataPoint(dataPoints[i].X, value);
-        //        }
-        //        else if (i == 0)
-        //            dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i + 1].Y / 2);
-        //        else if (i == dataPoints.Count - 1)
-        //            dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i - 1].Y / 2);
-        //        else
-        //            dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y);
-        //    }
-        //}
+        public static void AntiSpike(double R, ref List<DataPoint> dataPoints)
+        {
+            for (int i = 0; i < dataPoints.Count; i++)
+            {
+                if (Abs(dataPoints[i].Y) > R && i != 0 && i != dataPoints.Count - 1)
+                {
+                    double value = (dataPoints[i - 1].Y + dataPoints[i + 1].Y) / 2;
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, value);
+                }
+                else if (i == 0)
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i + 1].Y / 2);
+                else if (i == dataPoints.Count - 1)
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i - 1].Y / 2);
+                else
+                    dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y);
+            }
+        }
 
         /// <summary>
         /// Delete linear trend from general trend
@@ -164,11 +168,14 @@ namespace XDPM_App.ADMP
     {
         public static void Shift(BmpData data, byte shiftValue)
         {
+            //for (int i = 3; i < data.bytes.Length; i=i+4)
+            //    data.bytes[i] += shiftValue;
             for (int i = 0; i < data.bytes.Length; i++)
             {
                 data.bytes[i++] += shiftValue;
                 data.bytes[i++] += shiftValue;
                 data.bytes[i++] += shiftValue;
+                //data.bytes[i] += shiftValue;
             }
             data.ChangeBytesInImage();
         }

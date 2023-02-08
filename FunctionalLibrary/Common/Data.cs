@@ -7,28 +7,28 @@ using System.Windows.Media;
 using System.Windows;
 using System.IO;
 
-namespace XDPM_App.ADMP
+namespace XDPM_App.ADMP //подумать над всеми дата
 {
-    public class Data
+    public class Data : ICloneable //надо глубокое копирование сделать
     {
         public int N;
-        public double deltaT = 0.001;
+        private double deltaT = 0.001;
         public List<DataPoint> DataPoints = null!;
 
-        public Data(int N)
-        {
-            DataPoints = new(N);
-        }
+        public Data(int N) 
+            => DataPoints = new(N);
 
         public Data()
-        {
-            DataPoints = new List<DataPoint>();
-        }
+            => DataPoints = new List<DataPoint>();
 
         public void CalculateN()
-        {
-            N = DataPoints.Count;
-        }
+            => N = DataPoints.Count;
+
+        public void ChangeDelta(double deltaT)
+            => this.deltaT = deltaT;
+
+        public object Clone()
+            => MemberwiseClone();
     }
 
     public class SimpleTrendData : Data
@@ -71,9 +71,7 @@ namespace XDPM_App.ADMP
         }
 
         public HarmonicData() : base()
-        {
-            Param = new List<HarmParams>();
-        }
+            => Param = new List<HarmParams>();
     }
 
     public class WavData : Data
@@ -90,21 +88,15 @@ namespace XDPM_App.ADMP
 
     public class BmpData : Data
     {
-        public BitmapImage Image;
-        public byte[] bytes;
+        public BitmapImage Image = null!;
+        public byte[] bytes = null!;
 
-        public BmpData(string path)
-        {
-            Image = new BitmapImage(new Uri(path));
-            int stride = Image.PixelWidth * (Image.Format.BitsPerPixel / 8);
-            bytes = new byte[Image.PixelHeight * stride];
-            Image.CopyPixels(bytes, stride, 0);
-        }
+        public BmpData() { }
 
         public void ChangeBytesInImage()
         {
             WriteableBitmap wbm = new(Image.PixelWidth, Image.PixelHeight,
-                Image.DpiX, Image.DpiY, PixelFormats.Bgra32, null);
+                Image.DpiX, Image.DpiY, PixelFormats.Bgr32, null);
             wbm.WritePixels(new Int32Rect(0, 0, Image.PixelWidth, Image.PixelHeight),
                 bytes, Image.PixelWidth * (wbm.Format.BitsPerPixel / 8), 0);
 
@@ -118,15 +110,6 @@ namespace XDPM_App.ADMP
             Image.StreamSource = stream;
             Image.EndInit();
             Image.Freeze();
-        }
-
-        public void Save(string filePath)
-        {
-            JpegBitmapEncoder encoder = new();
-            encoder.Frames.Add(BitmapFrame.Create(Image));
-
-            using var fileStream = new FileStream(filePath, FileMode.Create);
-            encoder.Save(fileStream);
         }
     }
 }

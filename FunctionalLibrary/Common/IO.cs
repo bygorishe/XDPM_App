@@ -7,6 +7,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows.Markup;
+using System.Windows.Media.Imaging;
 using XDPM_App.ADMP;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
@@ -20,7 +22,8 @@ namespace FunctionalLibrary.Common
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static void Read(Data data, double delta_t = 0.001, bool doubleAccuracy = false, string? file = null, int rate = -1, bool isDate = false)
+        public static void Read(Data data, double delta_t = 0.001, bool doubleAccuracy = false,
+            string? file = null, int rate = -1, bool isDate = false)
         {
             string path;
             if (file == null)
@@ -48,6 +51,9 @@ namespace FunctionalLibrary.Common
                             ReadTxtFile(data, path, delta_t);
                         break;
                     }
+                case ".jpg":
+                    ReadJpgFile(data, path);
+                    break;
                 default:
                     throw new Exception("cant read this file format");
             }
@@ -137,23 +143,22 @@ namespace FunctionalLibrary.Common
                 throw new Exception("Not wav Data");
         }
 
-        public static Bitmap ReadJpgFile()
+        private static void ReadJpgFile(Data data, string path)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Title = "Open Image";
-            dlg.Filter = "jpg files (*.jpg)|*.jpg|All files (*.*)|*.*";
-
-            if (dlg.ShowDialog() == true)
-            {
-                return new Bitmap(dlg.OpenFile());
-            }
-            return null;
+            if (data is not BmpData)
+                throw new Exception("not bmpdata");
+            BmpData bmpData = (BmpData)data;
+            bmpData.Image = new BitmapImage(new Uri(path));
+            int stride = bmpData.Image.PixelWidth * (bmpData.Image.Format.BitsPerPixel / 8);
+            bmpData.bytes = new byte[bmpData.Image.PixelHeight * stride];
+            bmpData.Image.CopyPixels(bmpData.bytes, stride, 0);
         }
 
-        public static void Write(List<DataPoint> list, bool isDoubleAccuracy = false)
+
+        public static void Write(Data data, bool isDoubleAccuracy = false)
         {
             SaveFileDialog dialog = new();
-            dialog.Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat"; /* | All files(*.*) | *.*| Bin file(*.bin) | *.bin*/
+            dialog.Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat|Image file(*.jpg)|*.jpg"; /* | All files(*.*) | *.*| Bin file(*.bin) | *.bin*/
             if (dialog.ShowDialog() == false)
                 return;
             string path = dialog.FileName;
@@ -161,33 +166,48 @@ namespace FunctionalLibrary.Common
             switch (fileExt)
             {
                 case ".dat":
-                    WriteBinFile(list, path, isDoubleAccuracy);
+                    WriteBinFile(data, path, isDoubleAccuracy);
                     break;
                 case ".txt":
-                    WriteTxtFile(list, path);
+                    WriteTxtFile(data, path);
                     break;
                 case ".wav":
 
                     break;
+                case ".jpg":
+                    WriteJpgFile(data, path);
+                    break;
             }
         }
 
-        private static void WriteBinFile(List<DataPoint> list, string path, bool isDoubleAccuracy)
+        private static void WriteBinFile(Data data, string path, bool isDoubleAccuracy)
         {
             using BinaryWriter binaryWriter = new(File.Open(path, FileMode.OpenOrCreate));
             if (isDoubleAccuracy)
-                for (int i = 0; i < list.Count; i++)
-                    binaryWriter.Write(list[i].Y);
+                for (int i = 0; i < data.DataPoints.Count; i++)
+                    binaryWriter.Write(data.DataPoints[i].Y);
             else
-                for (int i = 0; i < list.Count; i++)
-                    binaryWriter.Write(Convert.ToSingle(list[i].Y));
+                for (int i = 0; i < data.DataPoints.Count; i++)
+                    binaryWriter.Write(Convert.ToSingle(data.DataPoints[i].Y));
         }
 
-        private static void WriteTxtFile(List<DataPoint> list, string path)
+        private static void WriteTxtFile(Data data, string path)
         {
             using StreamWriter streamWriter = new(File.Open(path, FileMode.OpenOrCreate));
-            for (int i = 0; i < list.Count; i++)
-                streamWriter.WriteLine(list[i].Y);
+            for (int i = 0; i < data.DataPoints.Count; i++)
+                streamWriter.WriteLine(data.DataPoints[i].Y);
+        }
+
+        private static void WriteJpgFile(Data data, string filePath)
+        {
+            if (data is not BmpData)
+                throw new Exception("not bmpdata");
+            BmpData bmpData = (BmpData)data;
+
+            JpegBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(bmpData.Image));
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            encoder.Save(fileStream);
         }
 
         //private static void WriteDateTxtFile(List<DataPoint> list, string path)

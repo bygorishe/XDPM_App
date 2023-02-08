@@ -29,13 +29,18 @@ namespace XDPM_App
         public MainWindow()
         {
             InitializeComponent();
-            BmpData data = new("C:/Users/angry/Desktop/grace.jpg");
+            BmpData data = new(), data2 = new();
+            IO.Read(data);
+            data2 = (BmpData)data.Clone();
+            //BmpData data = new("C:/Users/angry/Desktop/grace.jpg");
             Image1.Source = data.Image;
             ImageProccesing.Shift(data, 30);
-            data.Save("C:/Users/angry/Desktop/grace1.jpg");
+            IO.Write(data);
+            //data.Save("C:/Users/angry/Desktop/grace1.jpg");
             Image2.Source = data.Image;
             ImageProccesing.Mult(data, 1.3);
-            data.Save("C:/Users/angry/Desktop/grace2.jpg");
+            IO.Write(data);
+            //data.Save("C:/Users/angry/Desktop/grace2.jpg");
             Image3.Source = data.Image;
         }
 
