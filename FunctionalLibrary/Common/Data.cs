@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 using System.IO;
+using XDPM_App.Common;
 
 namespace XDPM_App.ADMP //подумать над всеми дата
 {
@@ -21,14 +22,21 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         public Data()
             => DataPoints = new List<DataPoint>();
 
+        private Data(int n, double deltaT, List<DataPoint> dataPoints)
+        {
+            N= n;
+            this.deltaT = deltaT;
+            this.DataPoints = dataPoints;
+        }
+
         public void CalculateN()
             => N = DataPoints.Count;
 
         public void ChangeDelta(double deltaT)
             => this.deltaT = deltaT;
 
-        public object Clone()
-            => MemberwiseClone();
+        public virtual object Clone()
+            => new Data(N, deltaT, DataPointOperations.Copy(DataPoints));
     }
 
     public class SimpleTrendData : Data
@@ -86,19 +94,33 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         public WavData() : base() { }
     }
 
-    public class BmpData : Data
+    public class ImageData : Data
     {
+        public int Wigth;
+        public int Height;
         public BitmapImage Image = null!;
-        public byte[] bytes = null!;
+        public float[] bytes = null!;
+        // BGR32 - 32 бита на пиксель. первые три байта на rgb последний всегда 255 и не влияет на что-то (особенности формата)
 
-        public BmpData() { }
+        public ImageData() { }
+
+        private ImageData(BitmapImage image, float[] bytes)
+        {
+            Image = image;
+            this.bytes = bytes;
+            Wigth = Image.PixelWidth; 
+            Height = Image.PixelHeight;
+        }
 
         public void ChangeBytesInImage()
         {
             WriteableBitmap wbm = new(Image.PixelWidth, Image.PixelHeight,
                 Image.DpiX, Image.DpiY, PixelFormats.Bgr32, null);
+            byte[] tempBytes = new byte[bytes.Length];
+            for (int i = 0; i < bytes.Length; i++)
+                tempBytes[i] = (byte)bytes[i];
             wbm.WritePixels(new Int32Rect(0, 0, Image.PixelWidth, Image.PixelHeight),
-                bytes, Image.PixelWidth * (wbm.Format.BitsPerPixel / 8), 0);
+                tempBytes, Image.PixelWidth * (wbm.Format.BitsPerPixel / 8), 0);
 
             using MemoryStream stream = new();
             Image = new();
@@ -111,5 +133,8 @@ namespace XDPM_App.ADMP //подумать над всеми дата
             Image.EndInit();
             Image.Freeze();
         }
+
+        public override object Clone()
+            => new ImageData(Image.Clone(), (float[])bytes.Clone());
     }
 }

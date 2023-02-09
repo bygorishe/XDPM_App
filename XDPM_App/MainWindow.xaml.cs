@@ -29,19 +29,27 @@ namespace XDPM_App
         public MainWindow()
         {
             InitializeComponent();
-            BmpData data = new(), data2 = new();
+            ImageData data = new(), data2 = new();
             IO.Read(data);
-            data2 = (BmpData)data.Clone();
+            data2 = (ImageData)data.Clone();
             //BmpData data = new("C:/Users/angry/Desktop/grace.jpg");
             Image1.Source = data.Image;
             ImageProccesing.Shift(data, 30);
             IO.Write(data);
             //data.Save("C:/Users/angry/Desktop/grace1.jpg");
-            Image2.Source = data.Image;
-            ImageProccesing.Mult(data, 1.3);
-            IO.Write(data);
+            ImageProccesing.Mult(data2, 1.3);
+            IO.Write(data2);
             //data.Save("C:/Users/angry/Desktop/grace2.jpg");
-            Image3.Source = data.Image;
+            Image2.Source = data.Image;
+
+            Image3.Source = data2.Image;
+
+            textBlock.Text = "height = " + data2.Height.ToString() + "  ; width = " + data2.Wigth.ToString();
+
+            ImageProccesing.Scale(data);
+
+            Image4.Source = data.Image;
+
         }
 
         //ComboBox comboBox = new ComboBox

@@ -3,6 +3,7 @@ using OxyPlot;
 using System.Collections.Generic;
 using static System.Math;
 using System.Windows.Media.Imaging;
+using System.Linq;
 
 namespace XDPM_App.ADMP
 {
@@ -57,7 +58,7 @@ namespace XDPM_App.ADMP
 
         public static void MovingAverage(int W, ref List<DataPoint> dataPoints)
         {
-            int step =dataPoints.Count / W;
+            int step = dataPoints.Count / W;
             for (int i = 0; i < W; i++)
             {
                 double average = 0;
@@ -166,28 +167,42 @@ namespace XDPM_App.ADMP
 
     public static class ImageProccesing
     {
-        public static void Shift(BmpData data, byte shiftValue)
+        public static void Shift(ImageData data, byte shiftValue)
         {
-            //for (int i = 3; i < data.bytes.Length; i=i+4)
-            //    data.bytes[i] += shiftValue;
             for (int i = 0; i < data.bytes.Length; i++)
             {
                 data.bytes[i++] += shiftValue;
                 data.bytes[i++] += shiftValue;
                 data.bytes[i++] += shiftValue;
-                //data.bytes[i] += shiftValue;
             }
             data.ChangeBytesInImage();
         }
 
-        public static void Mult(BmpData data, double multValue)
+        public static void Mult(ImageData data, double multValue)
         {
             for (int i = 0; i < data.bytes.Length; i++)
             {
-                data.bytes[i] = (byte)(data.bytes[i++] * multValue);
-                data.bytes[i] = (byte)(data.bytes[i++] * multValue);
-                data.bytes[i] = (byte)(data.bytes[i++] * multValue);
+                data.bytes[i] = (float)(data.bytes[i++] * multValue);
+                data.bytes[i] = (float)(data.bytes[i++] * multValue);
+                data.bytes[i] = (float)(data.bytes[i++] * multValue);
             }
+            data.ChangeBytesInImage();
+        }
+
+        public static void Scale(ImageData data)
+        {
+            List<float> bytes = new(data.bytes.Length * 3 / 4);
+            for (int i = 0; i < data.bytes.Length; i += 4)
+            {
+                bytes.Add(data.bytes[i++]);
+                bytes.Add(data.bytes[i++]);
+                bytes.Add(data.bytes[i++]);
+            }
+            float min = bytes.Min(), div = bytes.Max() - min;
+
+            for (int i = 0; i < data.bytes.Length; i++)
+                data.bytes[i] = (data.bytes[i] - min) * byte.MaxValue / div;
+
             data.ChangeBytesInImage();
         }
     }

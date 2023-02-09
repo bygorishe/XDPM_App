@@ -55,7 +55,8 @@ namespace XDPM_App.ADMP
             return plotModel;
         }
 
-        public static PlotModel BuildHistModel(string plotName, List<DataPoint> dataPoints, int barCount = 10, OxyColor? seriesColor = null)
+        public static PlotModel BuildHistModel(string plotName, List<DataPoint> dataPoints, int barCount = 10, 
+            OxyColor? seriesColor = null)
         {
             var valueList = DataPointOperations.GetValue(dataPoints);
             double min = valueList.Min();
@@ -170,7 +171,8 @@ namespace XDPM_App.ADMP
         private static DataPoint ExpTrendPoint(double t, double a, double b)
             => new(t, a * Exp(b));
 
-        public static List<DataPoint> RandomNoiseTrend(int N, double R, double delta_t = _deltaT, bool canBeNegative = true)
+        public static List<DataPoint> RandomNoiseTrend(int N, double R, double delta_t = _deltaT, 
+            bool canBeNegative = true)
         {
             List<DataPoint> dataPoints = new(N);
             Random random = new();
@@ -209,7 +211,8 @@ namespace XDPM_App.ADMP
             List<DataPoint> dataPoints = new(N);
             Random random = new();
             for (int i = 0; i < N; i++)
-                dataPoints.Add(new DataPoint(i * delta_t, (random.Next(0, 2) == 0 ? 1 : -1) * random.NextDouble() * (R / 100)));
+                dataPoints.Add(new DataPoint(i * delta_t, (random.Next(0, 2) == 0 ? 1 : -1) 
+                    * random.NextDouble() * (R / 100)));
             for (int i = 0; i < M; i++)
             {
                 int x = 0;
@@ -223,7 +226,8 @@ namespace XDPM_App.ADMP
             return dataPoints;
         }
 
-        public static List<DataPoint> ImpulseT_NoiseTrend(int N, int T, double R, bool negativeSign = false, double delta_t = _deltaT)
+        public static List<DataPoint> ImpulseT_NoiseTrend(int N, int T, double R, bool negativeSign = false,
+            double delta_t = _deltaT)
         {
             List<DataPoint> dataPoints = new(N);
             Random random = new();

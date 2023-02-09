@@ -113,7 +113,8 @@ namespace XDPM_App.Common
         /// <param name="dataPoints2">Second datapoint's list</param>
         /// <param name="delta_t">Sampling interval</param>
         /// <returns></returns>
-        public static List<DataPoint> Convol(int N, int M, List<DataPoint> dataPoints1, List<DataPoint> dataPoints2) //свертка
+        public static List<DataPoint> Convol(int N, int M, List<DataPoint> dataPoints1,
+            List<DataPoint> dataPoints2) //свертка
         {
             List<DataPoint> newDataPoints = new(N);
             for (int i = 0; i < N; i++)
@@ -126,14 +127,16 @@ namespace XDPM_App.Common
             return newDataPoints;
         }
 
-        public static List<DataPoint> TakeRangeOf(List<DataPoint> dataPoints, int index, int count)
+        public static List<DataPoint> TakeRangeOf(List<DataPoint> dataPoints, int index,
+            int count)
         {
             DataPoint[] newDataPoints = new DataPoint[count];
             dataPoints.CopyTo(index, newDataPoints, 0, count);
             return newDataPoints.ToList();
         }
 
-        public static List<DataPoint> TakeRangeOfAndNullOther(List<DataPoint> dataPoints, int index, int count)
+        public static List<DataPoint> TakeRangeOfAndNullOther(List<DataPoint> dataPoints,
+            int index, int count)
         {
             int size = dataPoints.Count;
             DataPoint[] newDataPoints = new DataPoint[size];

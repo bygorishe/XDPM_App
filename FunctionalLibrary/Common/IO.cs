@@ -145,13 +145,18 @@ namespace FunctionalLibrary.Common
 
         private static void ReadJpgFile(Data data, string path)
         {
-            if (data is not BmpData)
+            if (data is not ImageData)
                 throw new Exception("not bmpdata");
-            BmpData bmpData = (BmpData)data;
+            ImageData bmpData = (ImageData)data;
             bmpData.Image = new BitmapImage(new Uri(path));
             int stride = bmpData.Image.PixelWidth * (bmpData.Image.Format.BitsPerPixel / 8);
-            bmpData.bytes = new byte[bmpData.Image.PixelHeight * stride];
-            bmpData.Image.CopyPixels(bmpData.bytes, stride, 0);
+            bmpData.bytes = new float[bmpData.Image.PixelHeight * stride];
+            byte[] tempBytes = new byte[bmpData.Image.PixelHeight * stride];
+            bmpData.Image.CopyPixels(tempBytes, stride, 0);
+            bmpData.Height = bmpData.Image.PixelHeight;
+            bmpData.Wigth = bmpData.Image.PixelWidth;
+            for(int i=0;i<tempBytes.Length;i++)
+                bmpData.bytes[i] = tempBytes[i];
         }
 
 
@@ -200,9 +205,9 @@ namespace FunctionalLibrary.Common
 
         private static void WriteJpgFile(Data data, string filePath)
         {
-            if (data is not BmpData)
+            if (data is not ImageData)
                 throw new Exception("not bmpdata");
-            BmpData bmpData = (BmpData)data;
+            ImageData bmpData = (ImageData)data;
 
             JpegBitmapEncoder encoder = new();
             encoder.Frames.Add(BitmapFrame.Create(bmpData.Image));
