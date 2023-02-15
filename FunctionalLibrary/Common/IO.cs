@@ -1,16 +1,16 @@
-﻿using NAudio.Wave;
+﻿using FunctionalLibrary.Helpers.Exceptions;
+using FunctionalLibrary.Helpers.Operations;
+using NAudio.Wave;
 using OxyPlot;
 using OxyPlot.Axes;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 using XDPM_App.ADMP;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Path = System.IO.Path;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace FunctionalLibrary.Common
@@ -23,7 +23,7 @@ namespace FunctionalLibrary.Common
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public static void Read(Data data, double delta_t = 0.001, bool doubleAccuracy = false,
-            string? file = null, int rate = -1, bool isDate = false)
+            string? file = null, bool isDate = false)
         {
             string path;
             if (file == null)
@@ -53,6 +53,9 @@ namespace FunctionalLibrary.Common
                     }
                 case ".jpg":
                     ReadJpgFile(data, path);
+                    break;
+                case ".xcr":
+                    ReadXcrFile(data, path);
                     break;
                 default:
                     throw new Exception("cant read this file format");
@@ -99,9 +102,8 @@ namespace FunctionalLibrary.Common
             while (!string.IsNullOrEmpty(inString = streamReader.ReadLine()))
             {
                 string[] str = inString.Split("\t");
-                double value = Convert.ToDouble(str[2].Replace('.', ','));
+                double value = Convert.ToDouble(str[2].Replace('.', ',')); //usually, second column is Name, that why str[2]
                 var time = DateTime.Parse(str[0]);
-                //var day = new DateTime(int.Parse(date[2]), int.Parse(date[1]), int.Parse(date[0])); ;
                 double timeToDouble = DateTimeAxis.ToDouble(time);
                 data.DataPoints.Add(new DataPoint(timeToDouble, value));
                 i++;
@@ -153,17 +155,45 @@ namespace FunctionalLibrary.Common
             bmpData.bytes = new float[bmpData.Image.PixelHeight * stride];
             byte[] tempBytes = new byte[bmpData.Image.PixelHeight * stride];
             bmpData.Image.CopyPixels(tempBytes, stride, 0);
-            bmpData.Height = bmpData.Image.PixelHeight;
-            bmpData.Wigth = bmpData.Image.PixelWidth;
-            for(int i=0;i<tempBytes.Length;i++)
-                bmpData.bytes[i] = tempBytes[i];
+            bmpData.bytes = BytesOperations.ToFloat(tempBytes);
+            data.N = bmpData.Image.PixelWidth * bmpData.Image.PixelHeight;
         }
 
+        private static void ReadXcrFile(Data data, string path)
+        {
+            if (data is not ImageData)
+                throw new Exception("not bmpdata");
+            ImageData bmpData = (ImageData)data;
+
+            bmpData.bytes = new float[1024 * 1024 * 4]; //
+            byte[] tempBytes = new byte[1024 * 1024];
+
+            using BinaryReader binaryReader = new(File.Open(path, FileMode.Open));
+            int i = 0;
+            binaryReader.BaseStream.Position = 2048;
+            while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length - 8192)
+            {
+                binaryReader.ReadByte();
+                tempBytes[i++] = binaryReader.ReadByte();
+            }
+
+            // int j = 0;
+            for (int k = 0, j = 0; k < bmpData.bytes.Length; k++, j++)
+            {
+                bmpData.bytes[k++] = tempBytes[j];
+                bmpData.bytes[k++] = tempBytes[j];
+                bmpData.bytes[k++] = tempBytes[j];
+            }
+
+            bmpData.ChangeBytesInImage(1024, 1024, 96, 96, 32);
+            data.N = bmpData.Image.PixelWidth * bmpData.Image.PixelHeight;
+        }
 
         public static void Write(Data data, bool isDoubleAccuracy = false)
         {
             SaveFileDialog dialog = new();
-            dialog.Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat|Image file(*.jpg)|*.jpg"; /* | All files(*.*) | *.*| Bin file(*.bin) | *.bin*/
+            dialog.Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat|Bin file(*.bin)|*.bin|" +
+                "Image file(*.jpg)|*.jpg|Image file(*.xcr)|*.xcr";
             if (dialog.ShowDialog() == false)
                 return;
             string path = dialog.FileName;
@@ -172,15 +202,23 @@ namespace FunctionalLibrary.Common
             {
                 case ".dat":
                     WriteBinFile(data, path, isDoubleAccuracy);
-                    break;
+                    break;              
+                //case ".bin":
+                //    WriteBinFile(data, path, isDoubleAccuracy);
+                //    break;
                 case ".txt":
                     WriteTxtFile(data, path);
                     break;
                 case ".wav":
-
+                    //
                     break;
                 case ".jpg":
                     WriteJpgFile(data, path);
+                    break;
+                case ".xcr":
+                    WriteXcrFile(data, path);
+                    break;
+                default:
                     break;
             }
         }
@@ -206,13 +244,32 @@ namespace FunctionalLibrary.Common
         private static void WriteJpgFile(Data data, string filePath)
         {
             if (data is not ImageData)
-                throw new Exception("not bmpdata");
+                throw new ImageWrongDataException();
             ImageData bmpData = (ImageData)data;
 
             JpegBitmapEncoder encoder = new();
             encoder.Frames.Add(BitmapFrame.Create(bmpData.Image));
             using var fileStream = new FileStream(filePath, FileMode.Create);
             encoder.Save(fileStream);
+        }
+
+        private static void WriteXcrFile(Data data, string filePath)
+        {
+            if (data is not ImageData)
+                throw new ImageWrongDataException();
+            ImageData bmpData = (ImageData)data;
+
+            using BinaryWriter binaryWriter = new(File.Open(filePath, FileMode.OpenOrCreate));
+            for (int i = 0; i < 2048; i++)
+                binaryWriter.Write((byte)0);
+            for (int i = 0; i < bmpData.bytes.Length; i += 4)
+            {
+                binaryWriter.Write((byte)bmpData.bytes[i]);
+                binaryWriter.Write((byte)bmpData.bytes[i]);
+            }
+            for (int i = 0; i < 8192; i++)
+                binaryWriter.Write((byte)0);
+            binaryWriter.Close();
         }
 
         //private static void WriteDateTxtFile(List<DataPoint> list, string path)

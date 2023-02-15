@@ -6,11 +6,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 using System.IO;
-using XDPM_App.Common;
+using FunctionalLibrary.Helpers.Operations;
 
 namespace XDPM_App.ADMP //подумать над всеми дата
 {
-    public class Data : ICloneable //надо глубокое копирование сделать
+    public class Data : ICloneable
     {
         public int N;
         private double deltaT = 0.001;
@@ -26,7 +26,7 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         {
             N= n;
             this.deltaT = deltaT;
-            this.DataPoints = dataPoints;
+            DataPoints = dataPoints;
         }
 
         public void CalculateN()
@@ -39,18 +39,20 @@ namespace XDPM_App.ADMP //подумать над всеми дата
             => new Data(N, deltaT, DataPointOperations.Copy(DataPoints));
     }
 
-    public class SimpleTrendData : Data
+    public class TrendData : Data
     {
         public double a;
         public double b;
 
-        public SimpleTrendData(int N, double a, double b) : base(N)
+        public TrendData(int N, double a, double b) : base(N)
         {
             this.a = a;
             this.b = b;
         }
 
-        public SimpleTrendData() : base() { }
+        public TrendData() : base() { }
+
+        
     }
 
     public class NoiseData : Data
@@ -96,8 +98,6 @@ namespace XDPM_App.ADMP //подумать над всеми дата
 
     public class ImageData : Data
     {
-        public int Wigth;
-        public int Height;
         public BitmapImage Image = null!;
         public float[] bytes = null!;
         // BGR32 - 32 бита на пиксель. первые три байта на rgb последний всегда 255 и не влияет на что-то (особенности формата)
@@ -108,19 +108,35 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         {
             Image = image;
             this.bytes = bytes;
-            Wigth = Image.PixelWidth; 
-            Height = Image.PixelHeight;
         }
 
         public void ChangeBytesInImage()
         {
             WriteableBitmap wbm = new(Image.PixelWidth, Image.PixelHeight,
                 Image.DpiX, Image.DpiY, PixelFormats.Bgr32, null);
-            byte[] tempBytes = new byte[bytes.Length];
-            for (int i = 0; i < bytes.Length; i++)
-                tempBytes[i] = (byte)bytes[i];
+            byte[] tempBytes = BytesOperations.ToBytes(bytes);
             wbm.WritePixels(new Int32Rect(0, 0, Image.PixelWidth, Image.PixelHeight),
                 tempBytes, Image.PixelWidth * (wbm.Format.BitsPerPixel / 8), 0);
+
+            using MemoryStream stream = new();
+            Image = new();
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(wbm));
+            encoder.Save(stream);
+            Image.BeginInit();
+            Image.CacheOption = BitmapCacheOption.OnLoad;
+            Image.StreamSource = stream;
+            Image.EndInit();
+            Image.Freeze();
+        }    
+        
+        public void ChangeBytesInImage(int PixelWidth, int PixelHeight, double DpiX = 96, double DpiY = 96, int BitsPerPixel = 32)
+        {
+            WriteableBitmap wbm = new(PixelWidth, PixelHeight,
+                DpiX, DpiY, PixelFormats.Bgr32, null);
+            byte[] tempBytes = BytesOperations.ToBytes(bytes);
+            wbm.WritePixels(new Int32Rect(0, 0, PixelWidth, PixelHeight),
+                tempBytes, PixelWidth * (BitsPerPixel / 8), 0);
 
             using MemoryStream stream = new();
             Image = new();

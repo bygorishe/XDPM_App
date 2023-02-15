@@ -1,9 +1,9 @@
-﻿using XDPM_App.Common;
-using OxyPlot;
+﻿using OxyPlot;
 using System.Collections.Generic;
 using System.Linq;
 using static System.Math;
 using System;
+using FunctionalLibrary.Helpers.Operations;
 
 namespace XDPM_App.ADMP
 {

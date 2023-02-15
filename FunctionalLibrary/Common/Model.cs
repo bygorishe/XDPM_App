@@ -8,6 +8,7 @@ using OxyPlot.Axes;
 using System.Linq;
 using MathNet.Numerics.Distributions;
 using FunctionalLibrary.Helpers.Parametrs;
+using FunctionalLibrary.Helpers.Operations;
 
 namespace XDPM_App.ADMP
 {

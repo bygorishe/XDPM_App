@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace XDPM_App.Common
+namespace FunctionalLibrary.Helpers.Operations
 {
     public class DataPointOperations
     {
@@ -35,7 +35,7 @@ namespace XDPM_App.Common
         /// </summary>
         /// <param name="dataPoints"></param>
         /// <returns></returns>
-        public static List<DataPoint> SumPoints( params List<DataPoint>[] dataPoints)
+        public static List<DataPoint> SumPoints(params List<DataPoint>[] dataPoints)
         {
             int N = dataPoints[0].Count;
             List<double> y = new(N);
@@ -155,8 +155,8 @@ namespace XDPM_App.Common
         public static List<DataPoint> Join(params List<DataPoint>[] dataPoints)
         {
             List<DataPoint> newDataPoints = new();
-            foreach(var points in dataPoints)
-                newDataPoints.AddRange(newDataPoints);
+            foreach (var points in dataPoints)
+                newDataPoints.AddRange(points);
             return newDataPoints;
         }
     }

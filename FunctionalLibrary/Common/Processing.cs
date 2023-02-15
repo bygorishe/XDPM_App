@@ -1,9 +1,9 @@
-﻿using XDPM_App.Common;
-using OxyPlot;
+﻿using OxyPlot;
 using System.Collections.Generic;
 using static System.Math;
-using System.Windows.Media.Imaging;
 using System.Linq;
+using FunctionalLibrary.Helpers.Operations;
+using System.Windows.Media.Imaging;
 
 namespace XDPM_App.ADMP
 {
@@ -167,7 +167,7 @@ namespace XDPM_App.ADMP
 
     public static class ImageProccesing
     {
-        public static void Shift(ImageData data, byte shiftValue)
+        public static void Shift(ImageData data, float shiftValue)
         {
             for (int i = 0; i < data.bytes.Length; i++)
             {
@@ -178,25 +178,25 @@ namespace XDPM_App.ADMP
             data.ChangeBytesInImage();
         }
 
-        public static void Mult(ImageData data, double multValue)
+        public static void Mult(ImageData data, float multValue)
         {
             for (int i = 0; i < data.bytes.Length; i++)
             {
-                data.bytes[i] = (float)(data.bytes[i++] * multValue);
-                data.bytes[i] = (float)(data.bytes[i++] * multValue);
-                data.bytes[i] = (float)(data.bytes[i++] * multValue);
+                data.bytes[i] = data.bytes[i++] * multValue;
+                data.bytes[i] = data.bytes[i++] * multValue;
+                data.bytes[i] = data.bytes[i++] * multValue;
             }
             data.ChangeBytesInImage();
         }
 
-        public static void Scale(ImageData data)
+        public static void ByteScale(ImageData data)
         {
-            List<float> bytes = new(data.bytes.Length * 3 / 4);
-            for (int i = 0; i < data.bytes.Length; i += 4)
+            List<float> bytes = new(data.bytes.Length /** 3 *// 4);
+            for (int i = 0; i < data.bytes.Length; i+=3)
             {
                 bytes.Add(data.bytes[i++]);
-                bytes.Add(data.bytes[i++]);
-                bytes.Add(data.bytes[i++]);
+                //bytes.Add(data.bytes[i++]);
+                //bytes.Add(data.bytes[i++]);
             }
             float min = bytes.Min(), div = bytes.Max() - min;
 
@@ -204,6 +204,11 @@ namespace XDPM_App.ADMP
                 data.bytes[i] = (data.bytes[i] - min) * byte.MaxValue / div;
 
             data.ChangeBytesInImage();
+        }
+
+        public static void Rotate(ImageData data, Rotation rotation)
+        {
+
         }
     }
 }
