@@ -876,10 +876,10 @@
                 <!--<DockPanel>
                     <TextBlock Text="N" FontSize="16" Width="20"/>
                     <TextBox x:Name="TextBox_paramN" TextChanged="TextBox_paramN_TextChanged"/>
-                </DockPanel>
+                </DockPanel>-->
                 <Button Content="Начать" x:Name="NButton" Click="CreateTabItem"/>
 
-                <Separator Height="10" Background="Black"/>
+               <!-- <Separator Height="10" Background="Black"/>
 
                 <Button Content="New s" x:Name = "CreateTabItemButton" Click="CreateTabItem"/>-->
 

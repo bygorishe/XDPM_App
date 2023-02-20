@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Interop;
 using System.Windows.Ink;
 using System.Windows.Media.Media3D;
+using XDPM_App.SupWin;
 
 namespace XDPM_App
 {
@@ -29,24 +30,48 @@ namespace XDPM_App
         public MainWindow()
         {
             InitializeComponent();
-            ImageData data = new(), data2 = new();
+            ImageData data = new();
             IO.Read(data);
-            data2 = (ImageData)data.Clone();
+            ImageData data2 = (ImageData)data.Clone();
             Image1.Source = data.Image;
 
-            ImageProccesing.Shift(data, 650);
-            IO.Write(data);
-            ImageProccesing.Mult(data2, (float)1.3);
-            IO.Write(data2);
+            ImageProccesing.Rotate(data2);
+            Image2.Source = data2.Image;
 
-            Image2.Source = data.Image;
+            ImageProccesing.Symmetry(data2);
             Image3.Source = data2.Image;
 
-            textBlock.Text = "height = " + data2.Image.PixelHeight.ToString() + "  ; width = " + data2.Image.PixelWidth.ToString();
-
-            ImageProccesing.ByteScale(data);
-            //IO.Read(data);
+            ImageProccesing.NearestNeighborInterpolation(data, 0.8);
             Image4.Source = data.Image;
+            IO.Write(data);
+
+            //ImageProccesing.Shift(data, 30);
+            //IO.Write(data);
+            //ImageProccesing.Mult(data2, (float)1.3);
+            //IO.Write(data2);
+
+            //Image2.Source = data.Image;
+            //Image3.Source = data2.Image;
+
+            textBlock.Text = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
+
+            //ImageProccesing.ByteScale(data);
+            ////IO.Read(data);
+            //IO.Write(data);
+            //Image4.Source = data.Image;
+
+            //ImageData data3 = (ImageData)data.Clone();
+            //ImageData data4 = (ImageData)data.Clone();
+
+            //ImageProccesing.Negative(data);
+            //Image2.Source = data.Image;
+
+            //ImageProccesing.GammaTransform(data3, (float)7.5, 0.6);
+            //Image1.Source = data3.Image;
+
+            //ImageProccesing.LogTransform(data4, (float)17.2);
+            //Image3.Source = data4.Image;
+
         }
 
         //ComboBox comboBox = new ComboBox
@@ -54,15 +79,34 @@ namespace XDPM_App
         //    ItemsSource = typeof(Colors).GetProperties(),
         //};
 
-        //private void CreateTabItem(object sender, RoutedEventArgs e)
-        //{
-        //    MainTabControl.Items.Add(new TabItem
-        //    {
-        //        Header = new TextBlock { Text = "s" },
-        //        Name = "Name",
-        //        Focusable = true,
-        //    });
-        //}
+        private void CreateTabItem(object sender, RoutedEventArgs e)
+        {
+            TabItemBox box = new();
+            TabEditWindow tabEdit = new(box);
+            tabEdit.ShowDialog();
+            MainTabControl.Items.Add(new TabItem
+            {
+                Header = new TextBlock { Text = box.TabItemName.ToLower() },
+                Name = box.TabItemName,
+                Focusable = true,
+            });
+            switch (box.CanvasCount)
+            {
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+                case 4:
+
+                    break;
+                case 9:
+
+                    break;
+
+            }
+        }
 
         //private void ComboBox_DropDownOpened(object sender, EventArgs e)
         //{

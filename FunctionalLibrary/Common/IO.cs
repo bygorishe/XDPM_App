@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using XDPM_App.ADMP;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
@@ -23,17 +24,18 @@ namespace FunctionalLibrary.Common
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public static void Read(Data data, double delta_t = 0.001, bool doubleAccuracy = false,
-            string? file = null, bool isDate = false)
+            string? filePath = null, bool isDate = false)
         {
             string path;
-            if (file == null)
+            if (filePath == null)
             {
                 OpenFileDialog openFileDialog = new();
                 if (openFileDialog.ShowDialog() == false)
                     throw new Exception("File not found");
                 path = openFileDialog.FileName;
             }
-            else path = file;
+            else 
+                path = filePath;
             string fileExtension = Path.GetExtension(path);
             switch (fileExtension)
             {
@@ -58,7 +60,7 @@ namespace FunctionalLibrary.Common
                     ReadXcrFile(data, path);
                     break;
                 default:
-                    throw new Exception("cant read this file format");
+                    throw new Exception("Сant read this file format");
             }
         }
 
@@ -114,9 +116,9 @@ namespace FunctionalLibrary.Common
         // боже храни тебя господьб найдено и честно позаимствованое
         // https://stackoverflow.com/questions/59469985/c-sharp-get-frequency-spectrum-lines-of-a-wav-file
         // https://github.com/swharden/Spectrogram //если нужны спектограммы
-        private static (List<double> audio, int sampleRate) ReadMono(string filePath, double multiplier = 16_000)
+        private static (List<double> audio, int sampleRate) ReadMono(string path, double multiplier = 16_000)
         {
-            using var afr = new AudioFileReader(filePath);
+            using var afr = new AudioFileReader(path);
             int sampleRate = afr.WaveFormat.SampleRate;
             int bytesPerSample = afr.WaveFormat.BitsPerSample / 8;
             int sampleCount = (int)(afr.Length / bytesPerSample);
@@ -131,61 +133,65 @@ namespace FunctionalLibrary.Common
 
         private static void ReadWavFile(Data data, string path)
         {
-            if (data is WavData wavData)
-            {
-                wavData.DataPoints = new();
-                (List<double> t, int sampleRate) = ReadMono(path);
-                int i = 0;
-                for (; i < t.Count; i++)
-                    wavData.DataPoints.Add(new DataPoint(i, t[i]));
-                wavData.N = i;
-                wavData.Rate = sampleRate;
-            }
-            else
-                throw new Exception("Not wav Data");
+            if (data is not WavData wavData)
+                throw new WavWrongDataException();
+            wavData.DataPoints = new();
+            (List<double> t, int sampleRate) = ReadMono(path);
+            int i = 0;
+            for (; i < t.Count; i++)
+                wavData.DataPoints.Add(new DataPoint(i, t[i]));
+            wavData.N = i;
+            wavData.Rate = sampleRate;
         }
 
         private static void ReadJpgFile(Data data, string path)
         {
-            if (data is not ImageData)
-                throw new Exception("not bmpdata");
-            ImageData bmpData = (ImageData)data;
+            if (data is not ImageData bmpData)
+                throw new ImageWrongDataException();
             bmpData.Image = new BitmapImage(new Uri(path));
             int stride = bmpData.Image.PixelWidth * (bmpData.Image.Format.BitsPerPixel / 8);
-            bmpData.bytes = new float[bmpData.Image.PixelHeight * stride];
+            bmpData.Bytes = new double[bmpData.Image.PixelHeight * stride];
             byte[] tempBytes = new byte[bmpData.Image.PixelHeight * stride];
             bmpData.Image.CopyPixels(tempBytes, stride, 0);
-            bmpData.bytes = BytesOperations.ToFloat(tempBytes);
+            bmpData.Bytes = BytesOperations.ToDouble(tempBytes);
+            bmpData.Width = bmpData.Image.PixelWidth;
+            bmpData.Height = bmpData.Image.PixelHeight;
             data.N = bmpData.Image.PixelWidth * bmpData.Image.PixelHeight;
         }
 
-        private static void ReadXcrFile(Data data, string path)
+        private static void ReadXcrFile(Data data, string path) /////////////
         {
-            if (data is not ImageData)
-                throw new Exception("not bmpdata");
-            ImageData bmpData = (ImageData)data;
-
-            bmpData.bytes = new float[1024 * 1024 * 4]; //
-            byte[] tempBytes = new byte[1024 * 1024];
-
+            if (data is not ImageData bmpData)
+                throw new ImageWrongDataException();
+            bmpData.Bytes = new double[1024 * 1024 * 4];
+            byte[] tempBytes = new byte[1024 * 1024 * 2];
             using BinaryReader binaryReader = new(File.Open(path, FileMode.Open));
+
+            binaryReader.BaseStream.Position = 608;
+            string s = "";
+            for(int d = 0;d<4;d++)
+            s += (char)binaryReader.ReadByte();
+
+            binaryReader.BaseStream.Position = 624;
+            string ss = "";
+            for (int d = 0; d < 4; d++)
+                ss += (char)binaryReader.ReadByte();
+
             int i = 0;
             binaryReader.BaseStream.Position = 2048;
-            while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length - 8192)
-            {
-                binaryReader.ReadByte();
+            while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length - 8192) //608  624 ///////////////////////
                 tempBytes[i++] = binaryReader.ReadByte();
-            }
 
-            // int j = 0;
-            for (int k = 0, j = 0; k < bmpData.bytes.Length; k++, j++)
+            for (int k = 0, j = 0; k < bmpData.Bytes.Length; k++, j += 2)
             {
-                bmpData.bytes[k++] = tempBytes[j];
-                bmpData.bytes[k++] = tempBytes[j];
-                bmpData.bytes[k++] = tempBytes[j];
+                bmpData.Bytes[k++] = tempBytes[j] * 256 + tempBytes[j + 1];
+                bmpData.Bytes[k++] = tempBytes[j] * 256 + tempBytes[j + 1];
+                bmpData.Bytes[k++] = tempBytes[j] * 256 + tempBytes[j + 1];
             }
+            bmpData.Width = bmpData.Image.PixelWidth;
+            bmpData.Height = bmpData.Image.PixelHeight;
 
-            bmpData.ChangeBytesInImage(1024, 1024, 96, 96, 32);
+            bmpData.ConvertBytesIntoImage(1024, 1024, 96, 96, 32);
             data.N = bmpData.Image.PixelWidth * bmpData.Image.PixelHeight;
         }
 
@@ -202,7 +208,7 @@ namespace FunctionalLibrary.Common
             {
                 case ".dat":
                     WriteBinFile(data, path, isDoubleAccuracy);
-                    break;              
+                    break;
                 //case ".bin":
                 //    WriteBinFile(data, path, isDoubleAccuracy);
                 //    break;
@@ -243,9 +249,8 @@ namespace FunctionalLibrary.Common
 
         private static void WriteJpgFile(Data data, string filePath)
         {
-            if (data is not ImageData)
+            if (data is not ImageData bmpData)
                 throw new ImageWrongDataException();
-            ImageData bmpData = (ImageData)data;
 
             JpegBitmapEncoder encoder = new();
             encoder.Frames.Add(BitmapFrame.Create(bmpData.Image));
@@ -255,17 +260,16 @@ namespace FunctionalLibrary.Common
 
         private static void WriteXcrFile(Data data, string filePath)
         {
-            if (data is not ImageData)
+            if (data is not ImageData bmpData)
                 throw new ImageWrongDataException();
-            ImageData bmpData = (ImageData)data;
 
             using BinaryWriter binaryWriter = new(File.Open(filePath, FileMode.OpenOrCreate));
             for (int i = 0; i < 2048; i++)
                 binaryWriter.Write((byte)0);
-            for (int i = 0; i < bmpData.bytes.Length; i += 4)
+            for (int i = 0; i < bmpData.Bytes.Length; i += 4)
             {
-                binaryWriter.Write((byte)bmpData.bytes[i]);
-                binaryWriter.Write((byte)bmpData.bytes[i]);
+                binaryWriter.Write((byte)0);// т.к. уже нормированные значения
+                binaryWriter.Write((byte)bmpData.Bytes[i]);
             }
             for (int i = 0; i < 8192; i++)
                 binaryWriter.Write((byte)0);

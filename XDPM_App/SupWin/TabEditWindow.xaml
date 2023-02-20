@@ -1,0 +1,80 @@
+﻿<Window x:Class="XDPM_App.SupWin.TabEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XDPM_App.SupWin"
+        mc:Ignorable="d"
+        Title="TabEditWindow" Height="150" Width="150" ResizeMode="NoResize" WindowStyle="None">
+    <Border 
+        BorderThickness="2"
+        BorderBrush="Black">
+        <StackPanel
+            Background="FloralWhite">
+            <TextBlock 
+                Text="Name" 
+                HorizontalAlignment="Center" 
+                Margin="0,15,0,10"/>
+            <TextBox
+                x:Name="TabNameTextBlock"
+                Width="140" />
+            <!--<DockPanel
+                Margin="5,10">
+                <Button 
+                    Content="Изображение"
+                    Click="Button_Click"/>
+                <Button 
+                    Content="График"
+                    Click="Button_Click_1"/>
+            </DockPanel>-->
+            <StackPanel>
+                <TextBlock
+                    Text="Количество полотен"
+                    HorizontalAlignment="Center"/>
+                <!--<Slider 
+                    x:Name="CountSlider"
+                    Minimum="1" 
+                    Maximum="9"
+                    TickPlacement="BottomRight"/>
+                <DockPanel>
+                    <TextBlock Text="1" Margin="2,0,5,0"/>
+                    <TextBlock Text="2" Margin="5.25,0"/>
+                    <TextBlock Text="3" Margin="5.25,0"/>
+                    <TextBlock Text="4" Margin="5.25,0"/>
+                    <TextBlock Text="5" Margin="5.25,0"/>
+                    <TextBlock Text="6" Margin="5.25,0"/>
+                    <TextBlock Text="7" Margin="5.25,0"/>
+                    <TextBlock Text="8" Margin="5.25,0"/>
+                    <TextBlock Text="9" Margin="4,0"/>
+                </DockPanel>-->
+                <DockPanel>
+                    <Button
+                        Click="Button_Click1"
+                        Content="1"
+                        Margin="5,0"
+                        Width="25"/>
+                    <Button
+                        Click="Button_Click2"
+                        Content="2"
+                        Margin="5,0"
+                        Width="25"/>
+                    <Button
+                        Click="Button_Click4"
+                        Content="4"
+                        Margin="5,0"
+                        Width="25"/>
+                    <Button
+                        Click="Button_Click9"
+                        Content="9"
+                        Margin="5,0"
+                        Width="25"/>
+                </DockPanel>
+            </StackPanel>
+            <Button
+                Content="Подтвердить" 
+                x:Name="TabNameConfirmedButton"
+                Click="TabNameConfirmedButton_Click"
+                Margin="0,10"/>
+        </StackPanel>
+    </Border>
+</Window>

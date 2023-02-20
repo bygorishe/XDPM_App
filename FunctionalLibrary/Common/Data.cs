@@ -16,7 +16,7 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         private double deltaT = 0.001;
         public List<DataPoint> DataPoints = null!;
 
-        public Data(int N) 
+        public Data(int N)
             => DataPoints = new(N);
 
         public Data()
@@ -24,7 +24,7 @@ namespace XDPM_App.ADMP //подумать над всеми дата
 
         private Data(int n, double deltaT, List<DataPoint> dataPoints)
         {
-            N= n;
+            N = n;
             this.deltaT = deltaT;
             DataPoints = dataPoints;
         }
@@ -52,7 +52,7 @@ namespace XDPM_App.ADMP //подумать над всеми дата
 
         public TrendData() : base() { }
 
-        
+
     }
 
     public class NoiseData : Data
@@ -99,50 +99,46 @@ namespace XDPM_App.ADMP //подумать над всеми дата
     public class ImageData : Data
     {
         public BitmapImage Image = null!;
-        public float[] bytes = null!;
+        public double[] Bytes = null!;
+        public Bgr32Byte[,]? BytesMatrix;
+        public int Width;
+        public int Height;
         // BGR32 - 32 бита на пиксель. первые три байта на rgb последний всегда 255 и не влияет на что-то (особенности формата)
+
+        public struct Bgr32Byte
+        {
+            public double[] Values = new double[4];
+
+            public Bgr32Byte() { }
+
+            public Bgr32Byte(double[] values)
+                => this.Values = values;
+        }
 
         public ImageData() { }
 
-        private ImageData(BitmapImage image, float[] bytes)
+        private ImageData(BitmapImage image, double[] bytes, Bgr32Byte[,]? bytesMatrix)
         {
             Image = image;
-            this.bytes = bytes;
+            Bytes = bytes;
+            Width = Image.PixelWidth;
+            Height = Image.PixelHeight;
+            BytesMatrix = bytesMatrix;
         }
 
-        public void ChangeBytesInImage()
+        public void ConvertBytesIntoImage()
         {
             WriteableBitmap wbm = new(Image.PixelWidth, Image.PixelHeight,
                 Image.DpiX, Image.DpiY, PixelFormats.Bgr32, null);
-            byte[] tempBytes = BytesOperations.ToBytes(bytes);
+            byte[] tempBytes = BytesOperations.ToBytes(Bytes);
             wbm.WritePixels(new Int32Rect(0, 0, Image.PixelWidth, Image.PixelHeight),
                 tempBytes, Image.PixelWidth * (wbm.Format.BitsPerPixel / 8), 0);
 
             using MemoryStream stream = new();
-            Image = new();
             PngBitmapEncoder encoder = new();
             encoder.Frames.Add(BitmapFrame.Create(wbm));
             encoder.Save(stream);
-            Image.BeginInit();
-            Image.CacheOption = BitmapCacheOption.OnLoad;
-            Image.StreamSource = stream;
-            Image.EndInit();
-            Image.Freeze();
-        }    
-        
-        public void ChangeBytesInImage(int PixelWidth, int PixelHeight, double DpiX = 96, double DpiY = 96, int BitsPerPixel = 32)
-        {
-            WriteableBitmap wbm = new(PixelWidth, PixelHeight,
-                DpiX, DpiY, PixelFormats.Bgr32, null);
-            byte[] tempBytes = BytesOperations.ToBytes(bytes);
-            wbm.WritePixels(new Int32Rect(0, 0, PixelWidth, PixelHeight),
-                tempBytes, PixelWidth * (BitsPerPixel / 8), 0);
-
-            using MemoryStream stream = new();
             Image = new();
-            PngBitmapEncoder encoder = new();
-            encoder.Frames.Add(BitmapFrame.Create(wbm));
-            encoder.Save(stream);
             Image.BeginInit();
             Image.CacheOption = BitmapCacheOption.OnLoad;
             Image.StreamSource = stream;
@@ -150,7 +146,56 @@ namespace XDPM_App.ADMP //подумать над всеми дата
             Image.Freeze();
         }
 
+        public void ConvertBytesIntoImage(int PixelWidth, int PixelHeight,
+            double DpiX = 96, double DpiY = 96, int BitsPerPixel = 32)
+        {
+            WriteableBitmap wbm = new(PixelWidth, PixelHeight,
+                DpiX, DpiY, PixelFormats.Bgr32, null);
+            byte[] tempBytes = BytesOperations.ToBytes(Bytes);
+            wbm.WritePixels(new Int32Rect(0, 0, PixelWidth, PixelHeight),
+                tempBytes, PixelWidth * (BitsPerPixel / 8), 0);
+
+            using MemoryStream stream = new();
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(wbm));
+            encoder.Save(stream);
+            Image = new();
+            Image.BeginInit();
+            Image.CacheOption = BitmapCacheOption.OnLoad;
+            Image.StreamSource = stream;
+            Image.EndInit();
+            Image.Freeze();
+        }
+
+        public void MakeByteMatrix()
+        {
+            BytesMatrix = new Bgr32Byte[Height, Width];
+            for (int j = 0; j < Height; j++)
+                for (int i = 0; i < Width; i++)
+                {
+                    BytesMatrix[j, i] = new();
+                    BytesMatrix[j, i].Values[0] = Bytes[(j * Width + i) * 4];
+                    BytesMatrix[j, i].Values[1] = Bytes[(j * Width + i) * 4 + 1];
+                    BytesMatrix[j, i].Values[2] = Bytes[(j * Width + i) * 4 + 2];
+                    BytesMatrix[j, i].Values[3] = Bytes[(j * Width + i) * 4 + 3];
+                }
+        }
+
+        public void MakeArrayFromMatrix()
+        {
+            Bytes = new double[Height * Width * 4];
+            for (int j = 0; j < Height; j++)
+                for (int i = 0; i < Width; i++)
+                {
+                    Bytes[(j * Width + i) * 4] = BytesMatrix![j, i].Values[0];
+                    Bytes[(j * Width + i) * 4 + 1] = BytesMatrix[j, i].Values[1];
+                    Bytes[(j * Width + i) * 4 + 2] = BytesMatrix[j, i].Values[2];
+                    Bytes[(j * Width + i) * 4 + 3] = BytesMatrix[j, i].Values[3];
+                }
+            ConvertBytesIntoImage(Width, Height);
+        }
+
         public override object Clone()
-            => new ImageData(Image.Clone(), (float[])bytes.Clone());
+            => new ImageData(Image.Clone(), (double[])Bytes.Clone(), (Bgr32Byte[,]?)BytesMatrix?.Clone());
     }
 }

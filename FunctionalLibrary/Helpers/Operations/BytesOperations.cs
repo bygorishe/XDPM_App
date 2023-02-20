@@ -2,7 +2,7 @@
 {
     public class BytesOperations
     {
-        public static byte[] ToBytes(float[] array)
+        public static byte[] ToBytes(double[] array)
         {
             byte[] bytes = new byte[array.Length];
             for (int i = 0; i < bytes.Length; i++)
@@ -10,9 +10,9 @@
             return bytes;
         }
 
-        public static float[] ToFloat(byte[] array)
+        public static double[] ToDouble(byte[] array)
         {
-            float[] bytes = new float[array.Length];
+            double[] bytes = new double[array.Length];
             for (int i = 0; i < bytes.Length; i++)
                 bytes[i] = array[i];
             return bytes;
