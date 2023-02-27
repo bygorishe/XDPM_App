@@ -35,13 +35,13 @@ namespace XDPM_App
             ImageData data2 = (ImageData)data.Clone();
             Image1.Source = data.Image;
 
-            ImageProccesing.Rotate(data2);
+            ImageProccesing.Ccw(data2);
             Image2.Source = data2.Image;
 
             ImageProccesing.Symmetry(data2);
             Image3.Source = data2.Image;
 
-            ImageProccesing.NearestNeighborInterpolation(data, 0.8);
+            ImageProccesing.BilinearInterpolation(data, 0.8);
             Image4.Source = data.Image;
             IO.Write(data);
 

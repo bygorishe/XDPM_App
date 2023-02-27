@@ -168,14 +168,16 @@ namespace FunctionalLibrary.Common
             using BinaryReader binaryReader = new(File.Open(path, FileMode.Open));
 
             binaryReader.BaseStream.Position = 608;
-            string s = "";
+            string str = "";
             for(int d = 0;d<4;d++)
-            s += (char)binaryReader.ReadByte();
+            str += (char)binaryReader.ReadByte();
+            bmpData.Width = Convert.ToInt32(str);
 
             binaryReader.BaseStream.Position = 624;
-            string ss = "";
+            str = "";
             for (int d = 0; d < 4; d++)
-                ss += (char)binaryReader.ReadByte();
+                str += (char)binaryReader.ReadByte();
+            bmpData.Height = Convert.ToInt32(str);
 
             int i = 0;
             binaryReader.BaseStream.Position = 2048;
@@ -188,10 +190,8 @@ namespace FunctionalLibrary.Common
                 bmpData.Bytes[k++] = tempBytes[j] * 256 + tempBytes[j + 1];
                 bmpData.Bytes[k++] = tempBytes[j] * 256 + tempBytes[j + 1];
             }
-            bmpData.Width = bmpData.Image.PixelWidth;
-            bmpData.Height = bmpData.Image.PixelHeight;
 
-            bmpData.ConvertBytesIntoImage(1024, 1024, 96, 96, 32);
+            bmpData.ConvertBytesIntoImage(bmpData.Width, bmpData.Height);
             data.N = bmpData.Image.PixelWidth * bmpData.Image.PixelHeight;
         }
 
@@ -258,21 +258,32 @@ namespace FunctionalLibrary.Common
             encoder.Save(fileStream);
         }
 
-        private static void WriteXcrFile(Data data, string filePath)
+        private static void WriteXcrFile(Data data, string filePath)////////////////////////////////
         {
             if (data is not ImageData bmpData)
                 throw new ImageWrongDataException();
 
             using BinaryWriter binaryWriter = new(File.Open(filePath, FileMode.OpenOrCreate));
-            for (int i = 0; i < 2048; i++)
-                binaryWriter.Write((byte)0);
+
+
+            binaryWriter.BaseStream.Position = 608;
+            string str = bmpData.Width.ToString();
+            for (int i = 0; i < str.Length; i++)
+                binaryWriter.Write(str[i]);
+
+            binaryWriter.BaseStream.Position = 624;
+            str = bmpData.Height.ToString();
+            for (int i = 0; i < str.Length; i++)
+                binaryWriter.Write(str[i]);
+
+            binaryWriter.BaseStream.Position = 2048;
             for (int i = 0; i < bmpData.Bytes.Length; i += 4)
             {
                 binaryWriter.Write((byte)0);// т.к. уже нормированные значения
                 binaryWriter.Write((byte)bmpData.Bytes[i]);
             }
-            for (int i = 0; i < 8192; i++)
-                binaryWriter.Write((byte)0);
+            binaryWriter.BaseStream.Position = 2048 + 8192 + bmpData.Bytes.Length / 4;
+            binaryWriter.Write((byte)0);
             binaryWriter.Close();
         }
 

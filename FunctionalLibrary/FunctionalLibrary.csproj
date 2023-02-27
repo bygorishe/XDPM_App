@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics.FSharp" Version="5.0.0" />
     <PackageReference Include="NAudio" Version="2.1.0" />
-    <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.1.2" />
     <PackageReference Include="Spectrogram" Version="1.6.1" />
   </ItemGroup>
 
