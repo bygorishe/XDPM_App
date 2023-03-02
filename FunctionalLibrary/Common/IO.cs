@@ -153,7 +153,8 @@ namespace FunctionalLibrary.Common
             bmpData.Bytes = new double[bmpData.Image.PixelHeight * stride];
             byte[] tempBytes = new byte[bmpData.Image.PixelHeight * stride];
             bmpData.Image.CopyPixels(tempBytes, stride, 0);
-            bmpData.Bytes = BytesOperations.ToDouble(tempBytes);
+            bmpData.Bytes = bmpData.Image.Format.BitsPerPixel == 32 ?
+                BytesOperations.ToDouble(tempBytes) : BytesOperations.ToDoubleBgr8(tempBytes);
             bmpData.Width = bmpData.Image.PixelWidth;
             bmpData.Height = bmpData.Image.PixelHeight;
             data.N = bmpData.Image.PixelWidth * bmpData.Image.PixelHeight;
@@ -163,22 +164,21 @@ namespace FunctionalLibrary.Common
         {
             if (data is not ImageData bmpData)
                 throw new ImageWrongDataException();
-            bmpData.Bytes = new double[1024 * 1024 * 4];
-            byte[] tempBytes = new byte[1024 * 1024 * 2];
-            using BinaryReader binaryReader = new(File.Open(path, FileMode.Open));
 
+            using BinaryReader binaryReader = new(File.Open(path, FileMode.Open));
             binaryReader.BaseStream.Position = 608;
             string str = "";
             for(int d = 0;d<4;d++)
             str += (char)binaryReader.ReadByte();
-            bmpData.Width = Convert.ToInt32(str);
-
+            bmpData.Height = Convert.ToInt32(str); //в файле сначала высота потом ширина
             binaryReader.BaseStream.Position = 624;
             str = "";
             for (int d = 0; d < 4; d++)
                 str += (char)binaryReader.ReadByte();
-            bmpData.Height = Convert.ToInt32(str);
+            bmpData.Width = Convert.ToInt32(str);
 
+            bmpData.Bytes = new double[bmpData.Height * bmpData.Width * 4];
+            byte[] tempBytes = new byte[bmpData.Height * bmpData.Width * 2];
             int i = 0;
             binaryReader.BaseStream.Position = 2048;
             while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length - 8192) //608  624 ///////////////////////
@@ -264,15 +264,13 @@ namespace FunctionalLibrary.Common
                 throw new ImageWrongDataException();
 
             using BinaryWriter binaryWriter = new(File.Open(filePath, FileMode.OpenOrCreate));
-
-
             binaryWriter.BaseStream.Position = 608;
-            string str = bmpData.Width.ToString();
+            string str = bmpData.Height.ToString();
             for (int i = 0; i < str.Length; i++)
                 binaryWriter.Write(str[i]);
 
             binaryWriter.BaseStream.Position = 624;
-            str = bmpData.Height.ToString();
+            str = bmpData.Width.ToString();
             for (int i = 0; i < str.Length; i++)
                 binaryWriter.Write(str[i]);
 

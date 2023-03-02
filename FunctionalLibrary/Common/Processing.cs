@@ -322,17 +322,14 @@ namespace XDPM_App.ADMP
             data.Width = newWidth;
             data.MakeArrayFromMatrix();
         }
-
-        public static double Bilinear(double p00, double p10, double p01, double p11, double x, double y)
-        {
-            return p00 * (1 - x) * (1 - y) + p10 * x * (1 - y) + p01 * (1 - x) * y + p11 * x * y;
-        }
-
         //int x = (i + 0.5) * m / a - 0.5
         //int y = (j + 0.5) * n / b - 0.5
         //instead of
         //int x = i * m / a
         //int y = j * n / b
+
+        private static double Bilinear(double p00, double p10, double p01, double p11, double x, double y)
+            => p00 * (1 - x) * (1 - y) + p10 * x * (1 - y) + p01 * (1 - x) * y + p11 * x * y;
 
         public static void BilinearInterpolation(ImageData data, double resizeCoefficient) //без матрицы попробовать
         {
@@ -359,41 +356,12 @@ namespace XDPM_App.ADMP
                     double y = (i / resizeCoefficient) % 1;
                     Bgr32Byte refByte = newByteMatrix[j, i] = new();
                     
-                    refByte.Values[0] = Bilinear(data.BytesMatrix[x0, y0].Values[0], data.BytesMatrix[x1, y0].Values[0], 
+                    refByte.Values[0] = Bilinear(data.BytesMatrix[x0, y0]!.Values[0], data.BytesMatrix[x1, y0].Values[0], 
                         data.BytesMatrix[x0, y1].Values[0], data.BytesMatrix[x1, y1].Values[0], x, y);
                     refByte.Values[1] = Bilinear(data.BytesMatrix[x0, y0].Values[1], data.BytesMatrix[x1, y0].Values[1],
                         data.BytesMatrix[x0, y1].Values[1], data.BytesMatrix[x1, y1].Values[1], x, y);
                     refByte.Values[2] = Bilinear(data.BytesMatrix[x0, y0].Values[2], data.BytesMatrix[x1, y0].Values[2],
                         data.BytesMatrix[x0, y1].Values[2], data.BytesMatrix[x1, y1].Values[2], x, y);
-
-
-
-
-
-
-
-
-
-
-
-                    //                    newR[i + j * Convert.ToInt32(newH)] = bjljnear(
-                    //    oldR[y0 + x0 * Convert.ToInt32(oldH)],
-                    //    oldR[y0 + x1 * Convert.ToInt32(oldH)],
-                    //    oldR[y1 + x0 * Convert.ToInt32(oldH)],
-                    //    oldR[y1 + x1 * Convert.ToInt32(oldH)],
-                    //    x, y);
-                    //newG[i + j * Convert.ToInt32(newH)] = bjljnear(
-                    //    oldG[y0 + x0 * Convert.ToInt32(oldH)],
-                    //    oldG[y0 + x1 * Convert.ToInt32(oldH)],
-                    //    oldG[y1 + x0 * Convert.ToInt32(oldH)],
-                    //    oldG[y1 + x1 * Convert.ToInt32(oldH)],
-                    //    x, y);
-                    //newB[i + j * Convert.ToInt32(newH)] = bjljnear(
-                    //    oldB[y0 + x0 * Convert.ToInt32(oldH)],
-                    //    oldB[y0 + x1 * Convert.ToInt32(oldH)],
-                    //    oldB[y1 + x0 * Convert.ToInt32(oldH)],
-                    //    oldB[y1 + x1 * Convert.ToInt32(oldH)],
-                    //    x, y);
                 }
 
             }

@@ -103,16 +103,18 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         public Bgr32Byte[,]? BytesMatrix;
         public int Width;
         public int Height;
-        // BGR32 - 32 бита на пиксель. первые три байта на rgb последний всегда 255 и не влияет на что-то (особенности формата)
+        // BGR32 - 32 бита на пиксель. первые три байта на rgb, последний всегда 255 и не влияет на что-то (особенности формата)
+        // BGR24 - 24 бита на пиксель. первые три байта на rgb /*не используется почти*/
+        // BGR8 - 8 бит на пиксель. черное и белое
 
         public struct Bgr32Byte
         {
-            public double[] Values = new double[4];
+            public double[] Values = new double[3];
 
             public Bgr32Byte() { }
 
             public Bgr32Byte(double[] values)
-                => this.Values = values;
+                => Values = values;
         }
 
         public ImageData() { }
@@ -177,7 +179,6 @@ namespace XDPM_App.ADMP //подумать над всеми дата
                     BytesMatrix[j, i].Values[0] = Bytes[(j * Width + i) * 4];
                     BytesMatrix[j, i].Values[1] = Bytes[(j * Width + i) * 4 + 1];
                     BytesMatrix[j, i].Values[2] = Bytes[(j * Width + i) * 4 + 2];
-                    BytesMatrix[j, i].Values[3] = Bytes[(j * Width + i) * 4 + 3];
                 }
         }
 
@@ -190,7 +191,7 @@ namespace XDPM_App.ADMP //подумать над всеми дата
                     Bytes[(j * Width + i) * 4] = BytesMatrix![j, i].Values[0];
                     Bytes[(j * Width + i) * 4 + 1] = BytesMatrix[j, i].Values[1];
                     Bytes[(j * Width + i) * 4 + 2] = BytesMatrix[j, i].Values[2];
-                    Bytes[(j * Width + i) * 4 + 3] = BytesMatrix[j, i].Values[3];
+                    Bytes[(j * Width + i) * 4 + 3] = 0;
                 }
             ConvertBytesIntoImage(Width, Height);
         }

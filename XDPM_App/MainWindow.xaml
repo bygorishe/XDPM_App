@@ -17,7 +17,9 @@
                     <TextBlock x:Name="textBlock"/>
                 </TabItem.Header>
                 <TabItem.Content>
-                    <Border BorderThickness="3" BorderBrush="Black">
+                    <Border 
+                        BorderThickness="3" 
+                        BorderBrush="Black">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>

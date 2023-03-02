@@ -32,46 +32,86 @@ namespace XDPM_App
             InitializeComponent();
             ImageData data = new();
             IO.Read(data);
+
             ImageData data2 = (ImageData)data.Clone();
+            ImageData data3 = (ImageData)data.Clone();
+            ImageData data4 = (ImageData)data.Clone();
             Image1.Source = data.Image;
+            Image1.ToolTip = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
 
-            ImageProccesing.Ccw(data2);
-            Image2.Source = data2.Image;
-
-            ImageProccesing.Symmetry(data2);
-            Image3.Source = data2.Image;
-
-            ImageProccesing.BilinearInterpolation(data, 0.8);
-            Image4.Source = data.Image;
-            IO.Write(data);
-
+            #region Laba1
             //ImageProccesing.Shift(data, 30);
+            //Image2.Source = data.Image;
+            //Image2.ToolTip = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
             //IO.Write(data);
-            //ImageProccesing.Mult(data2, (float)1.3);
+
+            //ImageProccesing.Mult(data2, 1.3);
+            //Image3.Source = data2.Image;
+            //Image3.ToolTip = "height = " + data2.Image.PixelHeight.ToString() + "  ; width = " + data2.Image.PixelWidth.ToString();
             //IO.Write(data2);
 
-            //Image2.Source = data.Image;
-            //Image3.Source = data2.Image;
+            //ImageProccesing.Symmetry(data3);
+            //Image4.Source = data3.Image;
+            //Image4.ToolTip = "height = " + data3.Image.PixelHeight.ToString() + "  ; width = " + data3.Image.PixelWidth.ToString();
+            //IO.Write(data3);
+            #endregion
 
-            textBlock.Text = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
-
+            #region Laba2
             //ImageProccesing.ByteScale(data);
-            ////IO.Read(data);
-            //IO.Write(data);
-            //Image4.Source = data.Image;
-
-            //ImageData data3 = (ImageData)data.Clone();
-            //ImageData data4 = (ImageData)data.Clone();
-
-            //ImageProccesing.Negative(data);
             //Image2.Source = data.Image;
+            //Image2.ToolTip = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
+            //IO.Write(data);
 
-            //ImageProccesing.GammaTransform(data3, (float)7.5, 0.6);
-            //Image1.Source = data3.Image;
+            //ImageProccesing.Ccw(data);
+            //Image3.Source = data.Image;
+            //Image3.ToolTip = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
+            //IO.Write(data);
 
-            //ImageProccesing.LogTransform(data4, (float)17.2);
-            //Image3.Source = data4.Image;
+            //ImageProccesing.Cw(data);
+            //ImageProccesing.Cw(data);
+            //Image4.Source = data.Image;
+            //Image4.ToolTip = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
+            //IO.Write(data);
+            #endregion
 
+            #region Laba3
+            //ImageProccesing.NearestNeighborInterpolation(data, 1.3);
+            //Image1.Source = data.Image;
+            //Image1.ToolTip = "height = " + data.Image.PixelHeight.ToString() + "  ; width = " + data.Image.PixelWidth.ToString();
+            //IO.Write(data);
+
+            //ImageProccesing.BilinearInterpolation(data2, 1.3);
+            //Image2.Source = data2.Image;
+            //Image2.ToolTip = "height = " + data2.Image.PixelHeight.ToString() + "  ; width = " + data2.Image.PixelWidth.ToString();
+            //IO.Write(data2);
+
+            //ImageProccesing.NearestNeighborInterpolation(data3, 0.7);
+            //Image3.Source = data3.Image;
+            //Image3.ToolTip = "height = " + data3.Image.PixelHeight.ToString() + "  ; width = " + data3.Image.PixelWidth.ToString();
+            //IO.Write(data3);
+
+            //ImageProccesing.BilinearInterpolation(data4, 0.7);
+            //Image4.Source = data4.Image;
+            //Image4.ToolTip = "height = " + data4.Image.PixelHeight.ToString() + "  ; width = " + data4.Image.PixelWidth.ToString();
+            //IO.Write(data4);
+            #endregion
+
+            #region Laba4
+            ImageProccesing.Negative(data2);
+            Image2.Source = data2.Image;
+            Image2.ToolTip = "height = " + data2.Image.PixelHeight.ToString() + "  ; width = " + data2.Image.PixelWidth.ToString();
+            IO.Write(data2);
+
+            ImageProccesing.GammaTransform(data3, (float)7.5, 0.6);
+            Image3.Source = data3.Image;
+            Image3.ToolTip = "height = " + data3.Image.PixelHeight.ToString() + "  ; width = " + data3.Image.PixelWidth.ToString();
+            IO.Write(data3);
+
+            ImageProccesing.LogTransform(data4, (float)17.2);
+            Image4.Source = data4.Image;
+            Image4.ToolTip = "height = " + data4.Image.PixelHeight.ToString() + "  ; width = " + data4.Image.PixelWidth.ToString();
+            IO.Write(data4);
+            #endregion
         }
 
         //ComboBox comboBox = new ComboBox
