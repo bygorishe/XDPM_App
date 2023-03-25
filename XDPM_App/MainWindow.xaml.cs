@@ -97,20 +97,61 @@ namespace XDPM_App
             #endregion
 
             #region Laba4
-            ImageProccesing.Negative(data2);
-            Image2.Source = data2.Image;
-            Image2.ToolTip = "height = " + data2.Image.PixelHeight.ToString() + "  ; width = " + data2.Image.PixelWidth.ToString();
-            IO.Write(data2);
+            //ImageProccesing.Negative(data2);
+            //Image2.Source = data2.Image;
+            //Image2.ToolTip = "height = " + data2.Image.PixelHeight.ToString() + "  ; width = " + data2.Image.PixelWidth.ToString();
+            //IO.Write(data2);
 
-            ImageProccesing.GammaTransform(data3, (float)7.5, 0.6);
-            Image3.Source = data3.Image;
-            Image3.ToolTip = "height = " + data3.Image.PixelHeight.ToString() + "  ; width = " + data3.Image.PixelWidth.ToString();
-            IO.Write(data3);
+            //ImageProccesing.GammaTransform(data3, (float)2.5, 0.6);
+            //Image3.Source = data3.Image;
+            //Image3.ToolTip = "height = " + data3.Image.PixelHeight.ToString() + "  ; width = " + data3.Image.PixelWidth.ToString();
+            //IO.Write(data3);
 
-            ImageProccesing.LogTransform(data4, (float)17.2);
-            Image4.Source = data4.Image;
-            Image4.ToolTip = "height = " + data4.Image.PixelHeight.ToString() + "  ; width = " + data4.Image.PixelWidth.ToString();
-            IO.Write(data4);
+            //ImageProccesing.LogTransform(data4, (float)17.2);
+            //Image4.Source = data4.Image;
+            //Image4.ToolTip = "height = " + data4.Image.PixelHeight.ToString() + "  ; width = " + data4.Image.PixelWidth.ToString();
+            //IO.Write(data4);
+            #endregion
+
+            #region Laba5
+            //double[] t = ImageProccesing.NormHist(data2.Bytes);
+            //Image3.Model = BuildHistModel("hist", t);
+            //ImageProccesing.MakeDistribution(ref t);
+            //ImageProccesing.CDF(data2, t);
+            //Image2.Source = data2.Image;
+            //Image2.ToolTip = "height = " + data2.Image.PixelHeight.ToString() + "  ; width = " + data2.Image.PixelWidth.ToString();
+            //Image4.Model = BuildHistModel("hist", t);
+
+            //IO.Read(data2);
+            //data2.Bytes = ImageProccesing.Difference(data.Bytes, data2.Bytes);
+            //data2.ConvertBytesIntoImage();
+            //Image1.Source = data2.Image;
+            #endregion
+
+            #region Laba6
+            Image4.Model = BuildModel("", ImageProccesing.XrayDetector(data));
+            ImageProccesing.XrayDetector(data);
+            #endregion
+
+            #region Lab7
+            //data3.Bytes = ImageNoise(data3.Bytes, 25);
+            //data3.ConvertBytesIntoImage();
+            //Image1.Source = data3.Image;
+            //ImageProccesing.AverageFilter(data3, 5);
+            //Image2.Source = data3.Image;
+
+            //data3.Bytes = ImageSaltAndPepper(data3.Bytes, 0.02);
+            //data3.ConvertBytesIntoImage();
+            //Image1.Source = data3.Image;
+            //ImageProccesing.MedianFilter(data3, 3);
+            //Image2.Source = data3.Image;
+
+            //data3.Bytes = ImageNoise(data3.Bytes, 25);
+            //data3.Bytes = ImageSaltAndPepper(data3.Bytes, 0.02);
+            //data3.ConvertBytesIntoImage();
+            //Image1.Source = data3.Image;
+            //ImageProccesing.MedianFilter(data3, 5);
+            //Image2.Source = data3.Image;
             #endregion
         }
 

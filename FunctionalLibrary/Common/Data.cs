@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows;
 using System.IO;
 using FunctionalLibrary.Helpers.Operations;
+using FunctionalLibrary.Helpers.Structs;
 
 namespace XDPM_App.ADMP //подумать над всеми дата
 {
@@ -100,26 +101,13 @@ namespace XDPM_App.ADMP //подумать над всеми дата
     {
         public BitmapImage Image = null!;
         public double[] Bytes = null!;
-        public Bgr32Byte[,]? BytesMatrix;
+        public RgbPixel[,]? BytesMatrix;
         public int Width;
         public int Height;
-        // BGR32 - 32 бита на пиксель. первые три байта на rgb, последний всегда 255 и не влияет на что-то (особенности формата)
-        // BGR24 - 24 бита на пиксель. первые три байта на rgb /*не используется почти*/
-        // BGR8 - 8 бит на пиксель. черное и белое
-
-        public struct Bgr32Byte
-        {
-            public double[] Values = new double[3];
-
-            public Bgr32Byte() { }
-
-            public Bgr32Byte(double[] values)
-                => Values = values;
-        }
 
         public ImageData() { }
 
-        private ImageData(BitmapImage image, double[] bytes, Bgr32Byte[,]? bytesMatrix)
+        private ImageData(BitmapImage image, double[] bytes, RgbPixel[,]? bytesMatrix)
         {
             Image = image;
             Bytes = bytes;
@@ -171,7 +159,7 @@ namespace XDPM_App.ADMP //подумать над всеми дата
 
         public void MakeByteMatrix()
         {
-            BytesMatrix = new Bgr32Byte[Height, Width];
+            BytesMatrix = new RgbPixel[Height, Width];
             for (int j = 0; j < Height; j++)
                 for (int i = 0; i < Width; i++)
                 {
@@ -197,6 +185,6 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         }
 
         public override object Clone()
-            => new ImageData(Image.Clone(), (double[])Bytes.Clone(), (Bgr32Byte[,]?)BytesMatrix?.Clone());
+            => new ImageData(Image.Clone(), (double[])Bytes.Clone(), (RgbPixel[,]?)BytesMatrix?.Clone());
     }
 }

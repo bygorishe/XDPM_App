@@ -56,7 +56,7 @@ namespace XDPM_App.ADMP
             return plotModel;
         }
 
-        public static PlotModel BuildHistModel(string plotName, List<DataPoint> dataPoints, int barCount = 10, 
+        public static PlotModel BuildHistModel(string plotName, List<DataPoint> dataPoints, int barCount = 10,
             OxyColor? seriesColor = null)
         {
             var valueList = DataPointOperations.GetValue(dataPoints);
@@ -67,7 +67,7 @@ namespace XDPM_App.ADMP
             List<HistogramItem> bars = new(barCount + 1);
             int[] count = new int[barCount];
             PlotModel plotModel = new() { Title = plotName };
-            for (int i = 0; i <= barCount; i++)
+            for (int i = 0; i <= barCount; i++) //полная хуйня, переделать   
                 ranges.Add(min + step * i);
             foreach (var value in valueList)
                 for (int i = 0; i < barCount; i++)
@@ -78,7 +78,30 @@ namespace XDPM_App.ADMP
                     }
             for (int i = 0; i < barCount; i++)
                 bars.Add(new HistogramItem(ranges[i], ranges[i + 1], count[i] * (ranges[i + 1] - ranges[i]), count[i]));
-            HistogramSeries series = new() 
+            HistogramSeries series = new()
+            {
+                StrokeThickness = 1,
+                FillColor = seriesColor != null ? (OxyColor)seriesColor : OxyColors.Automatic,
+            };
+            series.Items.AddRange(bars);
+            plotModel.Series.Add(series);
+            return plotModel;
+        }
+
+        public static PlotModel BuildHistModel(string plotName, double[] dataPoints, OxyColor? seriesColor = null)
+        {
+            //var valueList = DataPointOperations.GetValue(dataPoints);
+            //double min = valueList.Min();
+            //double max = valueList.Max();
+            //double step = (max - min) / barCount;
+            PlotModel plotModel = new() { Title = plotName };
+
+            List<HistogramItem> bars = new(dataPoints.Length);
+
+
+            for (int i = 0; i < dataPoints.Length; i++)
+                bars.Add(new HistogramItem(i, i + 1, dataPoints[i], (int)dataPoints[i]));
+            HistogramSeries series = new()
             {
                 StrokeThickness = 1,
                 FillColor = seriesColor != null ? (OxyColor)seriesColor : OxyColors.Automatic,
@@ -93,6 +116,14 @@ namespace XDPM_App.ADMP
             PlotModel plotModel = new() { Title = plotName };
             foreach (var s in series)
                 plotModel.Series.Add(s);
+            return plotModel;
+        }    
+        
+        public static PlotModel BuildModel(string plotName, List<List<DataPoint>> series)
+        {
+            PlotModel plotModel = new() { Title = plotName };
+            foreach (var s in series)
+                plotModel.Series.Add(ConvertToLineSeries(s, ""));
             return plotModel;
         }
 
@@ -172,7 +203,7 @@ namespace XDPM_App.ADMP
         private static DataPoint ExpTrendPoint(double t, double a, double b)
             => new(t, a * Exp(b));
 
-        public static List<DataPoint> RandomNoiseTrend(int N, double R, double delta_t = _deltaT, 
+        public static List<DataPoint> RandomNoiseTrend(int N, double R, double delta_t = _deltaT,
             bool canBeNegative = true)
         {
             List<DataPoint> dataPoints = new(N);
@@ -212,7 +243,7 @@ namespace XDPM_App.ADMP
             List<DataPoint> dataPoints = new(N);
             Random random = new();
             for (int i = 0; i < N; i++)
-                dataPoints.Add(new DataPoint(i * delta_t, (random.Next(0, 2) == 0 ? 1 : -1) 
+                dataPoints.Add(new DataPoint(i * delta_t, (random.Next(0, 2) == 0 ? 1 : -1)
                     * random.NextDouble() * (R / 100)));
             for (int i = 0; i < M; i++)
             {
@@ -271,6 +302,44 @@ namespace XDPM_App.ADMP
             for (int i = 0; i < N; i++)
                 dataPoints.Add(new DataPoint(i * delta_t, value[i]));
             return dataPoints;
+        }
+
+        public static double[] ImageNoise(double[] bytes, int R = 10)
+        {
+            double[] newBytes = bytes;
+            Random random = new Random();
+            for (int i = 0; i < newBytes.Length; i++)
+            {
+                double value = random.Next();
+                value = (value / int.MaxValue - 0.5) * 2 * R;
+                newBytes[i++] += value;
+                newBytes[i++] += value;
+                newBytes[i++] += value;
+            }
+            return newBytes;
+        }
+
+        public static double[] ImageSaltAndPepper(double[] bytes, double chance = 0.1)
+        {
+            double[] newBytes = bytes;
+            Random random = new Random();
+            for (int i = 0; i < newBytes.Length; i += 4)
+            {
+                double value = random.NextSingle();
+                if (chance / 2 <= value && value < chance)
+                {
+                    newBytes[i] = 0;
+                    newBytes[i + 1] = 0;
+                    newBytes[i + 2] = 0;
+                }
+                else if (0 <= value && value < chance / 2)
+                {
+                    newBytes[i] = 255;
+                    newBytes[i + 1] = 255;
+                    newBytes[i + 2] = 255;
+                }
+            }
+            return newBytes;
         }
     }
 }

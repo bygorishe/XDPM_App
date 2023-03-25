@@ -31,8 +31,10 @@
                             </Grid.RowDefinitions>
                             <Image x:Name="Image1" Grid.Column="0" Grid.Row="0"/>
                             <Image x:Name="Image2" Grid.Column="1" Grid.Row="0"/>
-                            <Image x:Name="Image3" Grid.Column="0" Grid.Row="1"/>
-                            <Image x:Name="Image4" Grid.Column="1" Grid.Row="1"/>
+                            <!--<Image x:Name="Image3" Grid.Column="0" Grid.Row="1"/>
+                            <Image x:Name="Image4" Grid.Column="1" Grid.Row="1"/>-->
+                            <oxy:PlotView x:Name="Image3" Grid.Column="0" Grid.Row="1"/>
+                            <oxy:PlotView x:Name="Image4" Grid.Column="1" Grid.Row="1"/>
                             <!--<Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
                                 <ColumnDefinition Width="auto"/>
