@@ -131,6 +131,7 @@ namespace XDPM_App
             #region Laba6
             Image4.Model = BuildModel("", ImageProccesing.XrayDetector(data));
             ImageProccesing.XrayDetector(data);
+            Image2.Source = data.Image;
             #endregion
 
             #region Lab7
