@@ -6,11 +6,11 @@
         public double End;
         public double Value;
 
-        public IntervalParams (double start, double end, double value)
+        public IntervalParams(double start, double end, double value)
         {
-            Start= start;
-            End= end;
-            Value= value;
+            Start = start;
+            End = end;
+            Value = value;
         }
     }
 }

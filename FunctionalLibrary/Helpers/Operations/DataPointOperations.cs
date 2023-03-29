@@ -1,4 +1,5 @@
 ﻿using OxyPlot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,16 +7,41 @@ namespace FunctionalLibrary.Helpers.Operations
 {
     public class DataPointOperations
     {
+        public static List<DataPoint> MakeDataPointsList(double[] values, double deltaT = 0.001)
+        {
+            int size = values.Length;
+            List<DataPoint> dataPoints = new List<DataPoint>(size);
+            for (int i = 0; i < size; i++)
+                dataPoints.Add(new DataPoint(i * deltaT, values[i]));
+            return dataPoints;
+        }
+
+        public static DataPoint[] MakeDataPoints(double[] values, double deltaT = 0.001)
+        {
+            int size = values.Length;
+            DataPoint[] dataPoints = new DataPoint[size];
+            for (int i = 0; i < size; i++)
+                dataPoints[i] = new DataPoint(i * deltaT, values[i]);
+            return dataPoints;
+        }
+
         /// <summary>
         /// Summarize number to all datapoints
         /// </summary>
         /// <param name="dataPoints"></param>
         /// <param name="number"></param>
-        public static void SumPointsWithNumber(ref List<DataPoint> dataPoints, double number)
+        public static void SumDataPointsWithNumber(ref DataPoint[] dataPoints, double number)
         {
-            int N = dataPoints.Count;
+            int N = dataPoints.Length;
             for (int i = 0; i < N; i++)
                 dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y + number);
+        }
+
+        public static void SumPointsWithNumber(ref double[] dataPoints, double number)
+        {
+            int N = dataPoints.Length;
+            for (int i = 0; i < N; i++)
+                dataPoints[i] += number;
         }
 
         /// <summary>
@@ -23,11 +49,18 @@ namespace FunctionalLibrary.Helpers.Operations
         /// </summary>
         /// <param name="dataPoints"></param>
         /// <param name="number"></param>
-        public static void MultPointsWithNumber(ref List<DataPoint> dataPoints, double number)
+        public static void MultDataPointsWithNumber(ref DataPoint[] dataPoints, double number)
         {
-            int N = dataPoints.Count;
+            int N = dataPoints.Length;
             for (int i = 0; i < N; i++)
                 dataPoints[i] = new DataPoint(dataPoints[i].X, dataPoints[i].Y * number);
+        }
+
+        public static void MultPointsWithNumber(ref double[] dataPoints, double number)
+        {
+            int N = dataPoints.Length;
+            for (int i = 0; i < N; i++)
+                dataPoints[i] *= number;
         }
 
         /// <summary>
@@ -35,32 +68,16 @@ namespace FunctionalLibrary.Helpers.Operations
         /// </summary>
         /// <param name="dataPoints"></param>
         /// <returns></returns>
-        public static List<DataPoint> SumPoints(params List<DataPoint>[] dataPoints)
+        public static DataPoint[] SumPoints(params DataPoint[][] dataPoints)
         {
-            int N = dataPoints[0].Count;
-            List<double> y = new(N);
-            List<DataPoint> newDataPoints = new(N);
-            for (int i = 0; i < N; i++)
-                y.Add(0);
+            int N = dataPoints[0].Length;
+            double[] y = new double[N];
+            DataPoint[] newDataPoints = new DataPoint[N];
             foreach (var list in dataPoints)
                 for (int i = 0; i < N; i++)
                     y[i] += list[i].Y;
             for (int i = 0; i < N; i++)
-                newDataPoints.Add(new DataPoint(dataPoints[0][i].X, y[i]));
-            return newDataPoints;
-        }
-
-        public static List<DataPoint> SumPoints(int N, params List<DataPoint>[] dataPoints)
-        {
-            List<double> y = new(N);
-            List<DataPoint> newDataPoints = new(N);
-            for (int i = 0; i < N; i++)
-                y.Add(0);
-            foreach (var list in dataPoints)
-                for (int i = 0; i < N; i++)
-                    y[i] += list[i].Y;
-            for (int i = 0; i < N; i++)
-                newDataPoints.Add(new DataPoint(dataPoints[0][i].X, y[i]));
+                newDataPoints[i] = new DataPoint(dataPoints[0][i].X, y[i]);
             return newDataPoints;
         }
 
@@ -69,39 +86,41 @@ namespace FunctionalLibrary.Helpers.Operations
         /// </summary>
         /// <param name="dataPoints"></param>
         /// <returns></returns>
-        public static List<DataPoint> MultPoints(params List<DataPoint>[] dataPoints)
+        public static DataPoint[] MultPoints(params DataPoint[][] dataPoints)
         {
-            int N = dataPoints[0].Count;
-            List<double> y = new(N);
-            List<DataPoint> newDataPoints = new(N);
+            int N = dataPoints[0].Length;
+            double[] y = new double[N];
+            DataPoint[] newDataPoints = new DataPoint[N];
             for (int i = 0; i < N; i++)
-                y.Add(1);
+                y[i] = 1;
             foreach (var list in dataPoints)
                 for (int i = 0; i < N; i++)
                     y[i] *= list[i].Y;
             for (int i = 0; i < N; i++)
-                newDataPoints.Add(new DataPoint(dataPoints[0][i].X, y[i]));
+                newDataPoints[i] = new DataPoint(dataPoints[0][i].X, y[i]);
             return newDataPoints;
         }
-
 
         /// <summary>
         /// Get list with datapoints value(Y)
         /// </summary>
         /// <param name="dataPoints"></param>
-        /// <returns></returns>
-        public static List<double> GetValue(List<DataPoint> dataPoints)
-            => dataPoints.Select(x => x.Y).ToList();
+        /// <returns></returns>;  
+        public static double[] GetValue(DataPoint[] dataPoints)
+            => dataPoints.Select(x => x.Y).ToArray();
+
+        public static double[] GetValue(List<DataPoint> dataPoints)
+            => dataPoints.Select(x => x.Y).ToArray();
 
         /// <summary>
         /// Normalized datapoints
         /// </summary>
         /// <param name="dataPoints"></param>
-        public static void Normalized(ref List<DataPoint> dataPoints)
+        public static void Normalized(ref DataPoint[] dataPoints)
         {
-            int N = dataPoints.Count;
+            int N = dataPoints.Length;
             double max = dataPoints.Select(x => x.Y).Max();
-            MultPointsWithNumber(ref dataPoints, 1 / max);
+            MultDataPointsWithNumber(ref dataPoints, 1 / max);
         }
 
         /// <summary>
@@ -113,26 +132,40 @@ namespace FunctionalLibrary.Helpers.Operations
         /// <param name="dataPoints2">Second datapoint's list</param>
         /// <param name="delta_t">Sampling interval</param>
         /// <returns></returns>
-        public static List<DataPoint> Convol(int N, int M, List<DataPoint> dataPoints1,
-            List<DataPoint> dataPoints2) //свертка
+        public static DataPoint[] DataPointsConvol(int N, int M, DataPoint[] dataPoints1,
+                                                                 DataPoint[] dataPoints2) //свертка
         {
-            List<DataPoint> newDataPoints = new(N);
+            DataPoint[] newDataPoints = new DataPoint[N];
             for (int i = 0; i < N; i++)
             {
                 double sum = 0;
                 for (int m = 0, t = i - m; m < M && t >= 0; m++, t--)
                     sum += dataPoints1[m].Y * dataPoints2[i - m].Y;
-                newDataPoints.Add(new DataPoint(dataPoints2[i].X, sum));
+                newDataPoints[i] = new DataPoint(dataPoints2[i].X, sum);
             }
             return newDataPoints;
         }
 
-        public static List<DataPoint> TakeRangeOf(List<DataPoint> dataPoints, int index,
-            int count)
+        public static double[] Convol(int N, int M, double[] dataPoints1,
+                                                    double[] dataPoints2) //свертка
+        {
+            double[] newDataPoints = new double[N];
+            for (int i = 0; i < N; i++)
+            {
+                double sum = 0;
+                for (int m = 0, t = i - m; m < M && t >= 0; m++, t--)
+                    sum += dataPoints1[m] * dataPoints2[i - m];
+                newDataPoints[i] = sum;
+            }
+            return newDataPoints;
+        }
+
+        public static DataPoint[] TakeRangeOf(DataPoint[] dataPoints, int index,
+                                                                      int count)
         {
             DataPoint[] newDataPoints = new DataPoint[count];
-            dataPoints.CopyTo(index, newDataPoints, 0, count);
-            return newDataPoints.ToList();
+            Array.Copy(dataPoints, index, newDataPoints, 0, count);
+            return newDataPoints;
         }
 
         public static List<DataPoint> TakeRangeOfAndNullOther(List<DataPoint> dataPoints,

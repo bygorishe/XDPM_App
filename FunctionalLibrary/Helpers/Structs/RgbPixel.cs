@@ -16,7 +16,7 @@
             Values[1] = values;
             Values[2] = values;
         }
-        
+
         public RgbPixel(double[] values)
             => Values = values;
 
@@ -36,7 +36,7 @@
             pixel1.Values[2] += pixel2.Values[2];
             return newPixel;
         }
-        
+
         public static RgbPixel operator -(RgbPixel pixel1, RgbPixel pixel2)
         {
             RgbPixel newPixel = pixel1;

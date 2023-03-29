@@ -3,29 +3,15 @@ using System.Collections.Generic;
 using static System.Math;
 using System.Linq;
 using FunctionalLibrary.Helpers.Operations;
-using static XDPM_App.ADMP.ImageData;
-using OxyPlot.Series;
 using System;
 using FunctionalLibrary.Helpers.Structs;
-using NAudio.Utils;
 
 namespace XDPM_App.ADMP
 {
     public static class Processing
     {
-        public static void Shift(ref List<DataPoint> dataPoints, double S)
-        {
-            DataPointOperations.SumPointsWithNumber(ref dataPoints, S);
-        }
-        /// <summary>
-        /// Correct datapoints on number
-        /// </summary>
-        /// <param name="dataPoints"></param>
-        /// <param name="M">Correcting number</param>
-        public static void AntiShift(ref List<DataPoint> dataPoints, double M)
-        {
-            DataPointOperations.SumPointsWithNumber(ref dataPoints, -M);
-        }
+        public static void Shift(ref DataPoint[] dataPoints, double S)
+            => DataPointOperations.SumDataPointsWithNumber(ref dataPoints, S);
 
         /// <summary>
         /// Delete values from datapoint, which more than R number
@@ -96,13 +82,13 @@ namespace XDPM_App.ADMP
                 for (int i = 0; i < M; i++)
                 {
                     List<DataPoint> temp = Model.RandomNoiseTrend(N, R);
-                    newDataPoints = DataPointOperations.SumPoints(temp, newDataPoints);
+                    newDataPoints = DataPointOperations.SumPoints(temp.ToArray(), newDataPoints.ToArray()).ToList();
                 }
             else
                 for (int i = 0; i < M; i++)
                 {
                     List<DataPoint> temp = Model.RandomNoiseTrend(N, R);
-                    newDataPoints = DataPointOperations.SumPoints(temp, newDataPoints, dataPoints);
+                    newDataPoints = DataPointOperations.SumPoints(temp.ToArray(), newDataPoints.ToArray(), dataPoints.ToArray()).ToList();
                 }
             return newDataPoints;
         }
@@ -474,65 +460,63 @@ namespace XDPM_App.ADMP
             data.ConvertBytesIntoImage();
         }
 
-        public static List<List<DataPoint>> XrayDetector(ImageData data, double dx = 1)
+        public static List<List<DataPoint>> FixXrayLines(ImageData data, double dx = 1)
         {
             if (data.BytesMatrix == null)
                 data.MakeByteMatrix();
 
-            double[,] deriviateStrokes = new double[data.Height / 10 + 1, data.Width];
+            double[][] deriviateStrokes = new double[data.Height / 10 + 1][];
             int k = 0;
             for (int i = 0; i < data.Height; i += 10)
             {
-                deriviateStrokes[k, 0] = data.BytesMatrix![i, 0].Values[0];
+                deriviateStrokes[k] = new double[data.Width];
+                deriviateStrokes[k][0] = data.BytesMatrix![i, 0].Values[0];
                 for (int j = 1; j < data.Width; j++)
-                    deriviateStrokes[k, j ] = (data.BytesMatrix![i, j - 1].Values[0] - data.BytesMatrix[i, j].Values[0]) / dx;
+                    deriviateStrokes[k][j] = (data.BytesMatrix![i, j - 1].Values[0] - data.BytesMatrix[i, j].Values[0]) / dx;
                 k++;
             }
 
             //////
-           List< List<DataPoint>> datas = new List<List<DataPoint>>();
-           List< List<DataPoint>> datas2 = new List<List<DataPoint>>();
-           List< List<DataPoint>> datas3 = new List<List<DataPoint>>();
-            for(int i = 0; i < data.Height / 10 + 1; i++)
+            List<List<DataPoint>> datas = new List<List<DataPoint>>();
+            List<List<double>> datas2 = new List<List<double>>();
+            List<List<DataPoint>> datas3 = new List<List<DataPoint>>();
+            for (int i = 0; i < data.Height / 10; i++)
             {
                 datas.Add(new List<DataPoint>());
-                datas2.Add(new List<DataPoint>());
+                datas2.Add(new List<double>());
                 datas3.Add(new List<DataPoint>());
 
-                for (int j = 0; j < data.Width; j++)
-                    datas[i].Add(new DataPoint(j, deriviateStrokes[i, j ]));
-                Analysis analysis = new Analysis(datas[i], datas[i].Count, 10);
                 if (i == 0)
-                    datas2[i] = analysis.CCF(datas[0].Select(x => x.Y).ToList());
+                    datas2[i] = Analysis.CCF(deriviateStrokes[i], deriviateStrokes[i]).ToList();
                 else
-                    datas2[i] = analysis.CCF(datas[i-1].Select(x => x.Y).ToList());
+                    datas2[i] = Analysis.CCF(deriviateStrokes[i], deriviateStrokes[i - 1]).ToList();
 
-                Analysis analysis1 = new(datas[i], datas[i].Count, 10);
-                datas3[i] = analysis1.SpectrFourier(datas[i].Count, 0, 1);
+                StatisticsAnalysis analysis1 = new(datas2[i], datas2[i].Count, 10);
+                datas3[i] = analysis1.SpectrFourier(datas2[i].Count, 0, 1).ToList();
 
             }
             //////
             double dada = 0;
-            foreach(var c in datas3)
+            foreach (var c in datas3)
             {
-                dada += c.Aggregate((x,y) => x.Y > y.Y ? x : y).X; ///////////////////
+                dada += c.Aggregate((x, y) => x.Y > y.Y ? x : y).X; ///////////////////
             }
             dada /= datas3.Count;
 
             List<List<DataPoint>> datassss = new List<List<DataPoint>>();
             List<List<DataPoint>> datassss123 = new List<List<DataPoint>>();
-            int m = 16;
+            int m = 32;
 
-            for (int i= 0; i< data.Height; i++)
+            for (int i = 0; i < data.Height; i++)
             {
                 datassss.Add(new List<DataPoint>());
                 datassss123.Add(new List<DataPoint>());
                 //for (int j = 0; j < 2 * m + 1; j++)
                 //    datassss[i].Add(new DataPoint(j, data.BytesMatrix[i, data.Width - (2*m + 1)  + j].Values[0]));
                 for (int j = 0; j < data.Width; j++)
-                        datassss[i].Add(new DataPoint(j, data.BytesMatrix[i, j].Values[0])); 
+                    datassss[i].Add(new DataPoint(j, data.BytesMatrix![i, j].Values[0]));
                 for (int j = 0; j < data.Width; j++)
-                        datassss[i].Add(new DataPoint(j, data.BytesMatrix[i, j].Values[0]));
+                    datassss[i].Add(new DataPoint(j, data.BytesMatrix![i, j].Values[0]));
 
 
 
@@ -540,21 +524,21 @@ namespace XDPM_App.ADMP
 
                 List<DataPoint> t3;
                 List<double> bsw = new(2 * m + 1);
-                Processing.RejectFilter(dada - dada/10, dada+ dada/5, 1, m, ref bsw);
+                Processing.RejectFilter(dada - dada / 5, dada + dada / 5, 1, m, ref bsw);
                 t3 = new List<DataPoint>(2 * m + 1);
                 for (int kk = 0; kk <= 2 * m; kk++)
                     t3.Add(new DataPoint(kk, bsw[kk]));
 
-                Analysis a44 = new(t3, 2 * m + 1);
+                StatisticsAnalysis a44 = new(bsw, 2 * m + 1);
 
-                datassss123[i] = (DataPointOperations.Convol(datassss[i].Count , 2 * m + 1, t3, datassss[i]));
+                datassss123[i] = (DataPointOperations.DataPointsConvol(datassss[i].Count, 2 * m + 1, t3.ToArray(), datassss[i].ToArray())).ToList();
             }
 
             //data.Width = datassss[0].Count;
             //data.BytesMatrix = new RgbPixel[data.Height, datassss[0].Count];
-            for(int i = 0; i< data.Height; i++)
+            for (int i = 0; i < data.Height; i++)
             {
-                for(int j  =0; j < data.Width; j++)
+                for (int j = 0; j < data.Width; j++)
                 {
                     int f = m;
                     //if (j < 2 * m + 1)
@@ -564,17 +548,12 @@ namespace XDPM_App.ADMP
                     //data.BytesMatrix[i, j].Values[0] = datassss123[i][f + j].Y;
                     //data.BytesMatrix[i, j].Values[1] = datassss123[i][f + j].Y;
                     //data.BytesMatrix[i, j].Values[2] = datassss123[i][f + j].Y;
-                    data.BytesMatrix[i, j] = new (datassss123[i][f + j].Y);
+                    data.BytesMatrix![i, j] = new(datassss123[i][f + j].Y);
                 }
             }
             data.MakeArrayFromMatrix();
             data.ConvertBytesIntoImage();
             return datas3;
-
-        }
-
-        public static void XrayFix()
-        {
 
         }
     }

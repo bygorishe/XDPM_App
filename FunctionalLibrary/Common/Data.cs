@@ -8,6 +8,7 @@ using System.Windows;
 using System.IO;
 using FunctionalLibrary.Helpers.Operations;
 using FunctionalLibrary.Helpers.Structs;
+using System.Linq;
 
 namespace XDPM_App.ADMP //подумать над всеми дата
 {
@@ -52,8 +53,6 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         }
 
         public TrendData() : base() { }
-
-
     }
 
     public class NoiseData : Data
@@ -75,11 +74,7 @@ namespace XDPM_App.ADMP //подумать над всеми дата
         public List<HarmParams> Param;
 
         public HarmonicData(int N, params HarmParams[] param) : base(N)
-        {
-            Param = new List<HarmParams>(param.Length);
-            foreach (var p in param)
-                Param.Add(p);
-        }
+            => Param = param.ToList();
 
         public HarmonicData() : base()
             => Param = new List<HarmParams>();

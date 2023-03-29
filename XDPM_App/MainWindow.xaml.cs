@@ -19,6 +19,9 @@ using System.Windows.Interop;
 using System.Windows.Ink;
 using System.Windows.Media.Media3D;
 using XDPM_App.SupWin;
+using System.Linq;
+using FunctionalLibrary.Helpers.Operations;
+using FunctionalLibrary.Helpers.Parametrs;
 
 namespace XDPM_App
 {
@@ -129,12 +132,12 @@ namespace XDPM_App
             #endregion
 
             #region Laba6
-            Image4.Model = BuildModel("", ImageProccesing.XrayDetector(data));
-            ImageProccesing.XrayDetector(data);
-            Image2.Source = data.Image;
+            //Image4.Model = BuildModel("", ImageProccesing.FixXrayLines(data));
+            //ImageProccesing.FixXrayLines(data);
+            //Image2.Source = data.Image;
             #endregion
 
-            #region Lab7
+            #region Laba7
             //data3.Bytes = ImageNoise(data3.Bytes, 25);
             //data3.ConvertBytesIntoImage();
             //Image1.Source = data3.Image;
@@ -153,6 +156,35 @@ namespace XDPM_App
             //Image1.Source = data3.Image;
             //ImageProccesing.MedianFilter(data3, 5);
             //Image2.Source = data3.Image;
+            #endregion
+
+            #region Laba8
+            //HarmParams[] pa =
+            //{
+            //    new HarmParams(30, 15),
+            //    new HarmParams(45, 45)
+            //};
+            //List<DataPoint> te = PolyHarmTrend(1000, pa.ToList());
+            //Image3.Model = BuildModel("", "", te);
+
+            List<DataPoint> te = CardioTrend(1000);
+            Image3.Model = BuildModel("", "", te);
+
+            Image4.Model = BuildModel("", "", DataPointOperations.MakeDataPointsList(
+                Analysis.InverseFourier(Analysis.Fourier(te.Select(x => x.Y).ToArray()))));
+            //Image4.Model = BuildModel("", "",  a.SpectrFourier(1000, 0).ToList());
+            //Image4.Model = BuildModel("", "", DataPointOperations.MakeDataPointsList((a.Fourier())));
+
+
+            //StatisticsAnalysis a = new StatisticsAnalysis();
+            //double[][] aaaaa = a.Fourier2D(data);
+            //List<List<DataPoint>> list = new List<List<DataPoint>>();
+            //foreach (var c in aaaaa)
+            //{
+            //    list.Add(DataPointOperations.MakeDataPointsList(c));
+            //}
+            //Image4.Model = BuildModel("", list);
+            //Image2.Source = data.Image;
             #endregion
         }
 

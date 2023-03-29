@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 using XDPM_App.ADMP;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
@@ -31,10 +30,10 @@ namespace FunctionalLibrary.Common
             {
                 OpenFileDialog openFileDialog = new();
                 if (openFileDialog.ShowDialog() == false)
-                    throw new Exception("File not found");
+                    return;
                 path = openFileDialog.FileName;
             }
-            else 
+            else
                 path = filePath;
             string fileExtension = Path.GetExtension(path);
             switch (fileExtension)
@@ -160,7 +159,7 @@ namespace FunctionalLibrary.Common
             data.N = bmpData.Image.PixelWidth * bmpData.Image.PixelHeight;
         }
 
-        private static void ReadXcrFile(Data data, string path) /////////////
+        private static void ReadXcrFile(Data data, string path)
         {
             if (data is not ImageData bmpData)
                 throw new ImageWrongDataException();
@@ -168,8 +167,8 @@ namespace FunctionalLibrary.Common
             using BinaryReader binaryReader = new(File.Open(path, FileMode.Open));
             binaryReader.BaseStream.Position = 608;
             string str = "";
-            for(int d = 0;d<4;d++)
-            str += (char)binaryReader.ReadByte();
+            for (int d = 0; d < 4; d++)
+                str += (char)binaryReader.ReadByte();
             bmpData.Height = Convert.ToInt32(str); //в файле сначала высота потом ширина
             binaryReader.BaseStream.Position = 624;
             str = "";
@@ -181,7 +180,7 @@ namespace FunctionalLibrary.Common
             byte[] tempBytes = new byte[bmpData.Height * bmpData.Width * 2];
             int i = 0;
             binaryReader.BaseStream.Position = 2048;
-            while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length - 8192) //608  624 ///////////////////////
+            while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length - 8192)
                 tempBytes[i++] = binaryReader.ReadByte();
 
             for (int k = 0, j = 0; k < bmpData.Bytes.Length; k++, j += 2)
@@ -197,9 +196,11 @@ namespace FunctionalLibrary.Common
 
         public static void Write(Data data, bool isDoubleAccuracy = false)
         {
-            SaveFileDialog dialog = new();
-            dialog.Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat|Bin file(*.bin)|*.bin|" +
-                "Image file(*.jpg)|*.jpg|Image file(*.xcr)|*.xcr";
+            SaveFileDialog dialog = new()
+            {
+                Filter = "Text files(*.txt)|*.txt|Bin file(*.dat)|*.dat|Bin file(*.bin)|*.bin|" +
+                "Image file(*.jpg)|*.jpg|Image file(*.xcr)|*.xcr"
+            };
             if (dialog.ShowDialog() == false)
                 return;
             string path = dialog.FileName;

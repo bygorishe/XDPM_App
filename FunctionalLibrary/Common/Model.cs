@@ -117,8 +117,8 @@ namespace XDPM_App.ADMP
             foreach (var s in series)
                 plotModel.Series.Add(s);
             return plotModel;
-        }    
-        
+        }
+
         public static PlotModel BuildModel(string plotName, List<List<DataPoint>> series)
         {
             PlotModel plotModel = new() { Title = plotName };
@@ -162,14 +162,28 @@ namespace XDPM_App.ADMP
         {
             List<DataPoint> dataPoints = new(N);
             for (int i = 0; i < N; i++)
-                dataPoints.Add(ExpTrendPoint(i * delta_t, a, b));
+                dataPoints.Add(ExpTrendPoint(i * delta_t, a, b * i * delta_t));
             return dataPoints;
+        }
+
+        private static DataPoint ExpTrendPoint(double t, double a, double b)
+            => new(t, a * Exp(b));
+
+        public static List<DataPoint> CardioTrend(int N, int M = 200, double delta_t = _deltaT)////////
+        {
+            DataPoint[] h1 = HarmTrend(N, 1, 14, delta_t).ToArray();
+            DataPoint[] h2 = ExpTrend(N, 1, -30, delta_t).ToArray();
+            DataPoint[] ht = DataPointOperations.MultPoints(h1, h2);
+            DataPointOperations.Normalized(ref ht);
+            DataPointOperations.MultDataPointsWithNumber(ref ht, 120);
+            DataPoint[] xt = ImpulseT_NoiseTrend(N, 200, 1, true, delta_t).ToArray();
+            return DataPointOperations.DataPointsConvol(N, M, ht, xt).ToList();
         }
 
         public static List<DataPoint> GBM(List<DataPoint> dataPoints, int N, int rangeNumber, double delta_t = 1)
         {
             List<DataPoint> newDataPoints = new(N);
-            List<double> value = DataPointOperations.GetValue(dataPoints);
+            double[] value = DataPointOperations.GetValue(dataPoints);
             int size = N / rangeNumber;
             for (int j = 0; j < rangeNumber; j++)
             {
@@ -199,9 +213,6 @@ namespace XDPM_App.ADMP
             }
             return newDataPoints;
         }
-
-        private static DataPoint ExpTrendPoint(double t, double a, double b)
-            => new(t, a * Exp(b));
 
         public static List<DataPoint> RandomNoiseTrend(int N, double R, double delta_t = _deltaT,
             bool canBeNegative = true)
