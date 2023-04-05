@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static System.Math;
 using System;
+using FunctionalLibrary.Helpers.Structs;
 
 namespace XDPM_App.ADMP
 {
@@ -141,7 +142,7 @@ namespace XDPM_App.ADMP
             return r / _N;
         }
 
-        public DataPoint[] ACF(double delta_t = _deltaT)
+        public DataPoint[] ACF(double deltaT = _deltaT)
         {
             DataPoint[] dataPoints = new DataPoint[_N];
             double max = double.MinValue;
@@ -153,7 +154,7 @@ namespace XDPM_App.ADMP
                 pointsValue.Add(temp);
             }
             for (int i = 0; i < _N; i++)
-                dataPoints[i] = new DataPoint(i * delta_t, pointsValue[i] / max);
+                dataPoints[i] = new DataPoint(i * deltaT, pointsValue[i] / max);
             return dataPoints;
         }
 
@@ -165,11 +166,11 @@ namespace XDPM_App.ADMP
             return r / _N;
         }
 
-        public DataPoint[] CCF(double[] t, double delta_t = _deltaT)
+        public DataPoint[] CCF(double[] t, double deltaT = _deltaT)
         {
             DataPoint[] dataPoints = new DataPoint[_N]; ;
             for (int i = 0; i < _N; i++)
-                dataPoints[i] = new DataPoint(i * delta_t, Rxy(i, t));
+                dataPoints[i] = new DataPoint(i * deltaT, Rxy(i, t));
             return dataPoints;
         }
 
@@ -195,9 +196,9 @@ namespace XDPM_App.ADMP
             return X;
         }
 
-        public DataPoint[] SpectrFourier(int N, int L = 0, double delta_t = _deltaT)
+        public DataPoint[] SpectrFourier(int N, int L = 0, double deltaT = _deltaT)
         {
-            double f_top = 1 / (2 * delta_t),
+            double f_top = 1 / (2 * deltaT),
                 f_delta = 2 * f_top / N;
             double[] temp = Fourier(L);
             DataPoint[] dataPoints = new DataPoint[N / 2];
@@ -209,8 +210,6 @@ namespace XDPM_App.ADMP
 
     public static class Analysis
     {
-        const double _deltaT = 0.001;
-
         private static double Rxx(double[] values, int L)
         {
             double r = 0;
@@ -277,8 +276,8 @@ namespace XDPM_App.ADMP
                 }
                 Re /= N;
                 Im /= N;
-                X[i] = Re + Im;
-                //X[i] = Sqrt(Re * Re + Im * Im);
+                X[i] = Sqrt(Re * Re + Im * Im);
+                //X[i] = Re + Im;
             }
             return X;
         }
@@ -298,18 +297,18 @@ namespace XDPM_App.ADMP
                     Re += values[k] * Cos(arg);
                     Im += values[k] * Sin(arg);
                 }
-                //Re /= _N;
-                //Im /= _N;
-                //X[i] = Sqrt(Re * Re + Im * Im);
-                X[i] = Re + Im;
+                //Re /= N;
+                //Im /= N;
+                X[i] = Sqrt(Re * Re + Im * Im);
+                //X[i] = Re + Im;
             }
             return X;
         }
 
-        public static DataPoint[] SpectrFourier(double[] values, int L = 0, double delta_t = _deltaT)
+        public static DataPoint[] SpectrFourier(double[] values, int L = 0, double deltaT = 0.001)
         {
             int N = values.Length;
-            double f_top = 1 / (2 * delta_t),
+            double f_top = 1 / (2 * deltaT),
                 f_delta = 2 * f_top / N;
             double[] temp = Fourier(values, L);
             DataPoint[] dataPoints = new DataPoint[N / 2];
@@ -320,35 +319,75 @@ namespace XDPM_App.ADMP
 
         public static double[][] Fourier2D(ImageData data) //////////////mrak
         {
-            double[][] newArray = new double[data.Height][];
             if (data.BytesMatrix == null)
                 data.MakeByteMatrix();
 
-            for (int i = 0; i < data.Height; i++)
+            int height = data.Height;
+            int width = data.Width;
+            double[][] newArray = new double[height][];
+            RgbPixel[,] matrix = data.BytesMatrix!;
+            for (int i = 0; i < height; i++)
             {
-                newArray[i] = new double[data.Width];
-                for (int j = 0; j < data.Width; j++)
+                newArray[i] = new double[width];
+                for (int j = 0; j < width; j++)
                 {
-                    newArray[i][j] = data.BytesMatrix![i, j].Values[0];
+                    newArray[i][j] = matrix[i, j].Values[0];
                 }
                 newArray[i] = Fourier(newArray[i]);
             }
 
-            double[][] tempArray = new double[data.Width][];
-            for (int i = 0; i < data.Width; i++)
+            double[][] tempArray = new double[width][];
+            for (int i = 0; i < width; i++)
             {
-                tempArray[i] = new double[data.Height];
-                for (int j = 0; j < data.Height; j++)
-                    tempArray[i][j] = newArray[data.Height - j - 1][i];
+                tempArray[i] = new double[height];
+                for (int j = 0; j < height; j++)
+                    tempArray[i][j] = newArray[j][width - 1 -i];
                 tempArray[i] = Fourier(tempArray[i]);
             }
 
-            for (int i = 0; i < data.Height; i++)
-                for (int j = 0; j < data.Width; j++)
-                    data.BytesMatrix![i, j] = new FunctionalLibrary.Helpers.Structs.RgbPixel(tempArray[data.Width - 1 - j][i]);
+            for (int i = 0; i < height; i++)
+                for (int j = 0; j < width; j++)
+                    matrix[i, j] = new(tempArray[j][height - 1 - i]);
 
             data.MakeArrayFromMatrix();
-            ImageProccesing.ByteScale(data);
+            //ImageProccesing.ByteScale(data);
+            data.ConvertBytesIntoImage();
+            return tempArray;
+        }
+
+        public static double[][] InverseFourier2D(ImageData data) //////////////mrak
+        {
+            if (data.BytesMatrix == null)
+                data.MakeByteMatrix();
+
+            int height = data.Height;
+            int width = data.Width;
+            double[][] newArray = new double[height][];
+            RgbPixel[,] matrix = data.BytesMatrix!;
+            for (int i = 0; i < height; i++)
+            {
+                newArray[i] = new double[width];
+                for (int j = 0; j < width; j++)
+                {
+                    newArray[i][j] = matrix[i, j].Values[0];
+                }
+                newArray[i] = InverseFourier(newArray[i]);
+            }
+
+            double[][] tempArray = new double[width][];
+            for (int i = 0; i < width; i++)
+            {
+                tempArray[i] = new double[height];
+                for (int j = 0; j < height; j++)
+                    tempArray[i][j] = newArray[j][width - 1 - i];
+                tempArray[i] = InverseFourier(tempArray[i]);
+            }
+
+            for (int i = 0; i < height; i++)
+                for (int j = 0; j < width; j++)
+                    matrix[i, j] = new(tempArray[j][height - 1 - i]);
+
+            data.MakeArrayFromMatrix();
             data.ConvertBytesIntoImage();
             return tempArray;
         }

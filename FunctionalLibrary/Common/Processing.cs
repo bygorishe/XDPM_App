@@ -328,7 +328,9 @@ namespace XDPM_App.ADMP
 
             if (data.BytesMatrix == null)
                 data.MakeByteMatrix();
+
             RgbPixel[,] newByteMatrix = new RgbPixel[newHeight, newWidth];
+            RgbPixel[,] matrix = data.BytesMatrix!;
 
             for (int j = 0; j < newHeight; j++)
             {
@@ -346,12 +348,12 @@ namespace XDPM_App.ADMP
                     double y = (i / resizeCoefficient) % 1;
                     RgbPixel refByte = newByteMatrix[j, i] = new();
 
-                    refByte.Values[0] = Bilinear(data.BytesMatrix![x0, y0].Values[0], data.BytesMatrix[x1, y0].Values[0],
-                        data.BytesMatrix[x0, y1].Values[0], data.BytesMatrix[x1, y1].Values[0], x, y);
-                    refByte.Values[1] = Bilinear(data.BytesMatrix[x0, y0].Values[1], data.BytesMatrix[x1, y0].Values[1],
-                        data.BytesMatrix[x0, y1].Values[1], data.BytesMatrix[x1, y1].Values[1], x, y);
-                    refByte.Values[2] = Bilinear(data.BytesMatrix[x0, y0].Values[2], data.BytesMatrix[x1, y0].Values[2],
-                        data.BytesMatrix[x0, y1].Values[2], data.BytesMatrix[x1, y1].Values[2], x, y);
+                    refByte.Values[0] = Bilinear(matrix[x0, y0].Values[0], matrix[x1, y0].Values[0],
+                        matrix[x0, y1].Values[0], matrix[x1, y1].Values[0], x, y);
+                    refByte.Values[1] = Bilinear(matrix[x0, y0].Values[1], matrix[x1, y0].Values[1],
+                        matrix[x0, y1].Values[1], matrix[x1, y1].Values[1], x, y);
+                    refByte.Values[2] = Bilinear(matrix[x0, y0].Values[2], matrix[x1, y0].Values[2],
+                        matrix[x0, y1].Values[2], matrix[x1, y1].Values[2], x, y);
                 }
 
             }
@@ -438,22 +440,13 @@ namespace XDPM_App.ADMP
             {
                 for (int j = halfWinSize; j < data.Width - halfWinSize; j++)
                 {
-                    /*
-                    List<RgbPixel> matrix = new List<RgbPixel>(windowSize * windowSize);
-                    for (int m = i - halfWinSize; m <= i + halfWinSize; m++)
-                        for (int n = j - halfWinSize; n <= j + halfWinSize; n++)
-                            matrix.Add(pixels[m, n]);
-                    matrix.Sort();
-                     */
                     List<double> matrix = new List<double>(windowSize * windowSize);
                     for (int m = i - halfWinSize; m <= i + halfWinSize; m++)
                         for (int n = j - halfWinSize; n <= j + halfWinSize; n++)
                             matrix.Add(pixels[m, n].Values[0]);
                     matrix.Sort();
 
-                    data.BytesMatrix![i, j].Values[0] = matrix[windowSize * windowSize / 2];
-                    data.BytesMatrix![i, j].Values[1] = matrix[windowSize * windowSize / 2];
-                    data.BytesMatrix![i, j].Values[2] = matrix[windowSize * windowSize / 2];
+                    data.BytesMatrix![i, j] = new(matrix[windowSize * windowSize / 2]);
                 }
             }
             data.MakeArrayFromMatrix();
@@ -465,22 +458,28 @@ namespace XDPM_App.ADMP
             if (data.BytesMatrix == null)
                 data.MakeByteMatrix();
 
-            double[][] deriviateStrokes = new double[data.Height / 10 + 1][];
             int k = 0;
+            int height = data.Height;
+            int width = data.Width;
+            RgbPixel[,] matrix = data.BytesMatrix!;
+            double[][] deriviateStrokes = new double[height/ 10 + 1][];
             for (int i = 0; i < data.Height; i += 10)
             {
-                deriviateStrokes[k] = new double[data.Width];
-                deriviateStrokes[k][0] = data.BytesMatrix![i, 0].Values[0];
-                for (int j = 1; j < data.Width; j++)
-                    deriviateStrokes[k][j] = (data.BytesMatrix![i, j - 1].Values[0] - data.BytesMatrix[i, j].Values[0]) / dx;
+                deriviateStrokes[k] = new double[width];
+                deriviateStrokes[k][0] = matrix![i, 0].Values[0];
+                for (int j = 1; j < width; j++)
+                    deriviateStrokes[k][j] = (matrix[i, j - 1].Values[0] - matrix[i, j].Values[0]) / dx;
                 k++;
             }
+
+            
+
 
             //////
             List<List<DataPoint>> datas = new List<List<DataPoint>>();
             List<List<double>> datas2 = new List<List<double>>();
             List<List<DataPoint>> datas3 = new List<List<DataPoint>>();
-            for (int i = 0; i < data.Height / 10; i++)
+            for (int i = 0; i < height/ 10; i++)
             {
                 datas.Add(new List<DataPoint>());
                 datas2.Add(new List<double>());
@@ -507,20 +506,14 @@ namespace XDPM_App.ADMP
             List<List<DataPoint>> datassss123 = new List<List<DataPoint>>();
             int m = 32;
 
-            for (int i = 0; i < data.Height; i++)
+            for (int i = 0; i < height; i++)
             {
                 datassss.Add(new List<DataPoint>());
                 datassss123.Add(new List<DataPoint>());
-                //for (int j = 0; j < 2 * m + 1; j++)
-                //    datassss[i].Add(new DataPoint(j, data.BytesMatrix[i, data.Width - (2*m + 1)  + j].Values[0]));
-                for (int j = 0; j < data.Width; j++)
-                    datassss[i].Add(new DataPoint(j, data.BytesMatrix![i, j].Values[0]));
-                for (int j = 0; j < data.Width; j++)
-                    datassss[i].Add(new DataPoint(j, data.BytesMatrix![i, j].Values[0]));
-
-
-
-
+                for (int j = 0; j < width; j++)
+                    datassss[i].Add(new DataPoint(j, matrix[i, j].Values[0]));
+                for (int j = 0; j < width; j++)
+                    datassss[i].Add(new DataPoint(j, matrix[i, j].Values[0]));
 
                 List<DataPoint> t3;
                 List<double> bsw = new(2 * m + 1);
@@ -530,27 +523,12 @@ namespace XDPM_App.ADMP
                     t3.Add(new DataPoint(kk, bsw[kk]));
 
                 StatisticsAnalysis a44 = new(bsw, 2 * m + 1);
-
                 datassss123[i] = (DataPointOperations.DataPointsConvol(datassss[i].Count, 2 * m + 1, t3.ToArray(), datassss[i].ToArray())).ToList();
             }
 
-            //data.Width = datassss[0].Count;
-            //data.BytesMatrix = new RgbPixel[data.Height, datassss[0].Count];
-            for (int i = 0; i < data.Height; i++)
-            {
-                for (int j = 0; j < data.Width; j++)
-                {
-                    int f = m;
-                    //if (j < 2 * m + 1)
-                    //    f = 3 * m + 1;
-                    //else
-                    //    f = -2 * m - 1;
-                    //data.BytesMatrix[i, j].Values[0] = datassss123[i][f + j].Y;
-                    //data.BytesMatrix[i, j].Values[1] = datassss123[i][f + j].Y;
-                    //data.BytesMatrix[i, j].Values[2] = datassss123[i][f + j].Y;
-                    data.BytesMatrix![i, j] = new(datassss123[i][f + j].Y);
-                }
-            }
+            for (int i = 0; i < height; i++)
+                for (int j = 0; j < width; j++)
+                    matrix[i, j] = new(datassss123[i][m + j].Y);
             data.MakeArrayFromMatrix();
             data.ConvertBytesIntoImage();
             return datas3;

@@ -352,5 +352,22 @@ namespace XDPM_App.ADMP
             }
             return newBytes;
         }
+
+        public static double[] MakeTestImage(int height, int width, int objectHeight, int objectWidth)
+        {
+            double[] bytes = new double[height * width * 4]; //bgr32
+
+            int axisX = (height  - objectHeight) / 2, axisY = (width - objectWidth) / 2;
+
+            for (int i = axisX; i < (height - axisX); i++)
+                for (int j = axisY * 4; j < (width - axisY) * 4; j++)
+                {
+                    bytes[i * height * 4 + j++] = 255;
+                    bytes[i * height*4 + j++] = 255;
+                    bytes[i * height*4 + j++] = 255;
+                }
+
+            return bytes;
+        }
     }
 }

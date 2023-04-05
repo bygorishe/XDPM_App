@@ -167,24 +167,33 @@ namespace XDPM_App
             //List<DataPoint> te = PolyHarmTrend(1000, pa.ToList());
             //Image3.Model = BuildModel("", "", te);
 
-            List<DataPoint> te = CardioTrend(1000);
-            Image3.Model = BuildModel("", "", te);
+            //List<DataPoint> te = CardioTrend(1000);
+            //Image3.Model = BuildModel("", "", te);
 
-            Image4.Model = BuildModel("", "", DataPointOperations.MakeDataPointsList(
-                Analysis.InverseFourier(Analysis.Fourier(te.Select(x => x.Y).ToArray()))));
-            //Image4.Model = BuildModel("", "",  a.SpectrFourier(1000, 0).ToList());
-            //Image4.Model = BuildModel("", "", DataPointOperations.MakeDataPointsList((a.Fourier())));
+            //Image4.Model = BuildModel("", "", DataPointOperations.MakeDataPointsList(
+            //    Analysis.InverseFourier(Analysis.Fourier(te.Select(x => x.Y).ToArray()))));
+            //Image4.Model = BuildModel("", "", DataPointOperations.MakeDataPointsList(
+            //  (Analysis.Fourier(te.Select(x => x.Y).ToArray()))));
+            ////Image4.Model = BuildModel("", "",  a.SpectrFourier(1000, 0).ToList());
+            ////Image4.Model = BuildModel("", "", DataPointOperations.MakeDataPointsList((a.Fourier())));
 
 
-            //StatisticsAnalysis a = new StatisticsAnalysis();
-            //double[][] aaaaa = a.Fourier2D(data);
+            //double[][] aaaaa = Analysis.Fourier2D(data);
+            //aaaaa = Analysis.InverseFourier2D(data);
             //List<List<DataPoint>> list = new List<List<DataPoint>>();
             //foreach (var c in aaaaa)
             //{
             //    list.Add(DataPointOperations.MakeDataPointsList(c));
             //}
             //Image4.Model = BuildModel("", list);
-            //Image2.Source = data.Image;
+            //double[] t = ImageProccesing.NormHist(data.Bytes);
+            //Image3.Model = BuildHistModel("hist", t);
+            //ImageProccesing.MakeDistribution(ref t);
+            //ImageProccesing.CDF(data, t);
+            ImageProccesing.LogTransform(data, 20);
+            data.Bytes = MakeTestImage(360, 480, 50, 50);
+            data.ConvertBytesIntoImage();
+            Image2.Source = data.Image;
             #endregion
         }
 
